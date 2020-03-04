@@ -41,7 +41,7 @@ function createCommentEl( response ) {
 
 	let comment = document.createElement( 'li' );
 	comment.setAttribute( 'data-created', response.created_at );
-	comment.setAttribute( 'data-author-avatar', response.user.avatar_url );
+	comment.setAttribute( 'data-author-avatar', response.user.avatar_url+'?size=60' );
 	comment.setAttribute( 'data-user-url', response.user.url );
 
 	comment.appendChild( user );
