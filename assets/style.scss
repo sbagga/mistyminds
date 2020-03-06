@@ -1,10 +1,13 @@
+---
+---
 
-//	
-// IMPORTS	
-//	
+//
+// IMPORTS
+//
 
-@import "reset";	
+@import "reset";
 @import "variables";
+// Syntax highlighting @import is at the bottom of this file
 
 /**************/
 /* BASE RULES */
@@ -188,7 +191,7 @@ ul, ol {
 }
 
 ul {
-  list-style-type: none;
+  list-style-type: disc;
 }
 
 ol {
@@ -251,29 +254,6 @@ p > img {
 
 .clearfix:after {
     clear: both;
-}
-
-
-
-.author-wrap {
-  width: 100%;
-  display: flex;
-  align-items: center
-}
-
-
-.avatar-img {
-  display: block,
-  border: 5px solid #ddd;
-  border-radius: 4px;
-  padding: 5px;
-  width: 50px;
-  border-radius: 50%;
-  margin-right: 10px;
-}
-
-.author-info {
-  margin: 0
 }
 
 /*********************/
@@ -510,7 +490,9 @@ body:after {
 }
 
 /* --------------------------------
+
 Modules - reusable parts of our design
+
 -------------------------------- */
 .cd-container {
   /* this class is used to give a max-width to the element it is applied to, and center it horizontally when it reaches that max-width */
@@ -630,10 +612,6 @@ Modules - reusable parts of our design
 #gh-latest{
     font-size: 16px;
     text-align: center;		
-}
-
-#gh-comments-list{	
-  list-style-type: none;		
 }
 
 .text-link {
@@ -1159,10 +1137,8 @@ Modules - reusable parts of our design
 }
 
 
-
 // Settled on moving the import of syntax highlighting to the bottom of the CSS
 // ... Otherwise it really bloats up the top of the CSS file and makes it difficult to find the start
 //@import "highlights";
 @import "darcula";
 @import "svg-icons";
-
