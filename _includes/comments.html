@@ -20,39 +20,53 @@ request.onload = function() {
 };
 
 function createCommentEl( response ) {
-	let user = document.createElement( 'a' );
-	user.setAttribute( 'href', response.user.url );
-	user.classList.add( 'user' );
+  
+  let authorInfo = document.createElement( 'div' );
+  authorInfo.classList.add( 'author-wrap' );
 
-	let userAvatar = document.createElement( 'img' );
-	userAvatar.classList.add( 'avatar' );
-	userAvatar.setAttribute( 'src', response.user.avatar_url );
+  let author = document.createElement( 'div' );
+
+  let authorAvatar = document.createElement( 'img' );
+  authorAvatar.classList.add( 'avatar-img' );
+  authorAvatar.setAttribute( 'src', response.user.avatar_url);
+
+  author.appendChild( authorAvatar );
+
+  authorInfo.appendChild( author );
+
+  
+  
+  let commentAuthor= document.createElement( 'div' );
+
+  let authorName= document.createElement( 'p' );
+  authorName.classList.add( 'author-info' );
+  authorName.innerHTML = response.user.login ;
+  
+  commentAuthor.appendChild( authorName );
+  
+  let commentTime= document.createElement( 'p' );
+  commentTime.classList.add( 'author-info' );
+  commentTime.innerHTML = response.created_at;
+  
+  commentAuthor.appendChild( commentTime );
+  
+  authorInfo.appendChild( commentAuthor );
+
+
+  let commentContents = document.createElement( 'div' );
+  commentContents.classList.add( 'comment-content' );
+  commentContents.innerHTML = response.body;
+
+  let comment = document.createElement( 'li' );
+
+
+  comment.appendChild( authorInfo );
+  comment.appendChild( commentContents );
+
+  return comment;
 	
-	userAvatar.setAttribute("width", "50");
-  	userAvatar.setAttribute("height", "50");
-
-	user.appendChild( userAvatar );
-
-	let commentLink = document.createElement( 'a' );
-	commentLink.setAttribute( 'href', response.html_url );
-	commentLink.classList.add( 'comment-url' );
-	commentLink.innerHTML = '#' + response.id + ' - ' + response.created_at;
-
-	let commentContents = document.createElement( 'div' );
-	commentContents.classList.add( 'comment-content' );
-	commentContents.innerHTML = response.body;
-
-	let comment = document.createElement( 'li' );
-	comment.setAttribute( 'data-created', response.created_at );
-	comment.setAttribute( 'data-author-avatar', response.user.avatar_url );
-	comment.setAttribute( 'data-user-url', response.user.url );
-
-	comment.appendChild( user );
-	comment.appendChild( commentContents );
-	comment.appendChild( commentLink );
-
-	return comment;
 }
+
 request.send();
 </script>
 
