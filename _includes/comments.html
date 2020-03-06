@@ -26,7 +26,10 @@ function createCommentEl( response ) {
 
 	let userAvatar = document.createElement( 'img' );
 	userAvatar.classList.add( 'avatar' );
-	userAvatar.setAttribute( 'src', response.user.avatar_url+'&s=50' );
+	userAvatar.setAttribute( 'src', response.user.avatar_url );
+	
+	userAvatar.setAttribute("width", "50");
+  	userAvatar.setAttribute("height", "50");
 
 	user.appendChild( userAvatar );
 
@@ -41,7 +44,7 @@ function createCommentEl( response ) {
 
 	let comment = document.createElement( 'li' );
 	comment.setAttribute( 'data-created', response.created_at );
-	comment.setAttribute( 'data-author-avatar', response.user.avatar_url+'&s=50' );
+	comment.setAttribute( 'data-author-avatar', response.user.avatar_url );
 	comment.setAttribute( 'data-user-url', response.user.url );
 
 	comment.appendChild( user );
