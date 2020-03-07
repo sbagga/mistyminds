@@ -58,6 +58,7 @@ function createCommentEl( response ) {
   commentContents.innerHTML = response.body;
 
   let comment = document.createElement( 'li' );
+  comment.setAttribute( 'id', 'li-gh-comment' );
 
 
   comment.appendChild( authorInfo );
