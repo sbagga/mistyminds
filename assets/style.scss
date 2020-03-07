@@ -187,7 +187,7 @@ a {
 
 ul, ol {
   margin: 15px 0;
-  padding-left: 30px;
+  padding-left: 0px;
 }
 
 ul {
@@ -644,6 +644,11 @@ Modules - reusable parts of our design
 
 #gh-comment-li{
   margin-bottom: 25px;
+}
+
+#leave-a-comment
+{
+  font-size: 90%;
 }
 
 .text-link {
