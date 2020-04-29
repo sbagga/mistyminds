@@ -1,11 +1,9 @@
-
 ---
 layout: post
-title:  Webassembly 带来的新计算平台
-categories: [web, cloud, edge, mobile]
-comments_id: 2
-excerpt: Webassembly是近10年来计算机语言的一个里程碑式的进展，作为一种通用可移植、高性能的语言规格，已经被主流浏览器支持，把web技术带入到下半场，形成了一个全新的终端计算平台，同时Webassembly也在快速被edge、cloud、blockchain社区采纳，在可以预见的未来成为一个极为重要的计算标准
+title: Some articles are just so short that we've to make the footer stick
+categories: Miscellaneous
 ---
+
 
 经过Mozilla、Google、Apple、Microsoft等技术巨头近10年的孵化和合作开发，2019年12月5号 Webassembly （WASM）Core Specification正式被W3C接纳web标准，成为浏览器中运行的HTML，CSS，Javascript之外的第四个语言，已经被四大主流浏览器（Firefox, Chrome, Safari, Edge）支持，各个层面大量的WASM开源项目开始涌现，包括语言编译器层面，几乎主流的编程语言都有WASM编译器项目，包括应用的WASM改造，包括非浏览器的WASM应用等，同时WASM社区也在非常快速扩展WASM的周边接口、安全规格等，有了WASM加持，Web浏览器重新焕发了青春，成为一个非常有竞争力的未来计算平台，Internet和web进入了进入一个新的时代。
 
@@ -37,5 +35,3 @@ WASM把浏览器变成一台虚拟机，之前这个虚拟机的功能比较薄�
 WASM既然是一种语言规格，通过不同的编译器实现完全可以运行在非浏览器的环境，WASM也在推广non-web的应用场景，其中WASI（Webassembly System Interface）是下一个最为关键的标准，它定义了异构编程语言的Runtime和WASM模块集成，WASM在浏览器中和JS和Web API对接，WASM模块访问OS功能等场景下的接口规格，WASI是一个数据格式标准，不同语言、OS、Runtime可以遵照这个统一的数据格式实现相互之间调用时候的变量数据类型适配。通过WASI，WASM模块的可集成性得到了彻底解决。在non-web环境下已经有多个WASM runtime项目，为了进一步合力开发non-web场景下的WASM使用，Mozilla、Intel、Fastly、Redhat发起成立了Byte Code Allince（[https://hacks.mozilla.org/2019/11/announcing-the-bytecode-alliance/](https://hacks.mozilla.org/2019/11/announcing-the-bytecode-alliance/)），包含了WASMTIME、Lucet、WAMR三个Runtiem和Cranelift，WASI COMMON等开源项目。同时也展示了他们规划的nanoprocess理念，提供了WASM模块之间的动态调用链接和基于细粒度能力调用的沙箱机制，这种nanoprocess将会极大推进一步推进软件SOA理念的实现。
 
 本篇只是WASM最宏观的介绍，WASM技术还在快速发展和演进中，后续还会具体介绍相关领域的进展。
-
-
