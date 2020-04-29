@@ -21,6 +21,8 @@ Webassembly的汇编代码设计是第一个经严格按照形式化语义（for
 
 下图展示了WASM的编译流程，WASM是LLVM编译器的一个backend实现。
 
+![WASM和机器代码编译比较](/images/wasm-llvm.png=150x)
+
 在浏览器环境，WASM byte code 被浏览器内置的高性能JIT编译器编译执行，例如在Chrome浏览器中，V8编译器加入了一个新的WASM编译器Liftoff，和对JS的JIT解释和热点区域JIT编译实现不同，WASM byte code会被liftoff完全编译为机器代码。WASM设计的时候也考虑到了x86和arm ISA，力求保持编译到汇编代码的overhead。目前性能和native code的差别在20%到100%之间（[https://www.usenix.org/system/files/atc19-jangda.pdf](https://www.usenix.org/system/files/atc19-jangda.pdf)），当然直接比较C语言和Webassembly是公平的，为了达到安全和可移植性，会有增量的代码存在。WASM的编译器技术还在发展，性能会持续提升。
 
 ## 2. Webassembly 为web注入了新的生命力
