@@ -1,7 +1,9 @@
 ---
 layout: post
-title: Some articles are just so short that we've to make the footer stick
-categories: Miscellaneous
+title:  Webassembly 带来的新计算平台
+categories: [web, cloud, edge, mobile]
+comments_id: 2
+excerpt: Webassembly是近10年来计算机语言的一个里程碑式的进展，作为一种通用可移植、高性能的语言规格，已经被主流浏览器支持，把web技术带入到下半场，形成了一个全新的终端计算平台，同时Webassembly也在快速被edge、cloud、blockchain社区采纳，在可以预见的未来成为一个极为重要的计算标准
 ---
 
 
