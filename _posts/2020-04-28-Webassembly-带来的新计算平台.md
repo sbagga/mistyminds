@@ -24,10 +24,10 @@ Webassembly的汇编代码设计是第一个经严格按照形式化语义（for
 ![WASM和机器代码编译比较](../images/wasm-llvm.png)
 
 
-在浏览器环境，WASM byte code 被浏览器内置的高性能JIT编译器编译执行，例如在Chrome浏览器中，V8编译器加入了一个新的WASM编译器Liftoff，和对JS的JIT解释和热点区域JIT编译实现不同，WASM byte code会被liftoff完全编译为机器代码。WASM设计的时候也考虑到了x86和arm ISA，力求保持编译到汇编代码的overhead。目前性能和native code的差别在20%到100%之间（[https://www.usenix.org/system/files/atc19-jangda.pdf](https://www.usenix.org/system/files/atc19-jangda.pdf)），当然直接比较C语言和Webassembly是公平的，为了达到安全和可移植性，会有增量的代码存在。WASM的编译器技术还在发展，性能会持续提升。
+在浏览器环境，WASM byte code 被浏览器内置的高性能JIT编译器编译执行，例如在Chrome浏览器中，V8编译器加入了一个新的WASM编译器Liftoff，和对JS的JIT解释和热点区域JIT编译实现不同，WASM byte code会被liftoff完全编译为机器代码。WASM设计的时候也考虑到了x86和arm ISA，力求保持编译到汇编代码的overhead。目前性能落后native code在20%到100%之间（[https://www.usenix.org/system/files/atc19-jangda.pdf](https://www.usenix.org/system/files/atc19-jangda.pdf)），当然直接比较C语言和Webassembly是公平的，为了达到安全和可移植性，会有增量的代码存在。WASM的编译器技术还在发展，性能会持续提升。
 
 ## 2. Webassembly 为web注入了新的生命力
-WASM把浏览器变成一台虚拟机，之前这个虚拟机的功能比较薄弱，只能跑Javascript，不支持其他语言，这样要支持一些性能攸关和OS相关的资源访问，就需要把这些能力植入到浏览器的本体代码里面，W3C过去为Browser标准化了很多这样的功能，例如：音频视频解码，图像渲染能力，OS外设访问等。通过支持WASM，大量的存量代码都可以被重新编译为WASM模块，可以动态加载到web应用中，通过Javascript调用，而不需要再通过浏览器来支持。这也是WASM设计的主要场景。AutoCAD公司之前尝试过把 3D 设计工具使用web技术来实现，都失败了，因为大量物理引擎计算都是C/C++写的，如果用Javascript重写性能是不达标的。通过把这些物理模拟计算的C/C++库编译为WASM，性能问题得到解决，AutoCAD终于提供了基于web技术的设计工具，功能和原生版本相差无几。另外一个例子是，第一视角射击游戏的鼻祖DOOM最近被移植到了WASM环境（[https://wasm.continuation-labs.com/d3demo/](https://wasm.continuation-labs.com/d3demo/)），当你访问这个网址，基于WASM的DOOM游戏会被加载，其可玩性和性能都是不错的。Bullet、ODE、PhysX这样的高性能物理引擎也在重新编译为WASM，可以预见的未来基于web的游戏和AR/VR应用开发环境会出现可以和Unity、Unreal这样的商业游戏引擎一教高下的web版本。
+WASM把浏览器变成一台虚拟机，之前这个虚拟机的功能比较薄弱，只能跑Javascript，不支持其他语言，这样要支持一些性能攸关和OS相关的资源访问，就需要把这些能力植入到浏览器的本体代码里面，W3C过去为Browser标准化了很多这样的功能，例如：音频视频解码，图像渲染能力，OS外设访问等。通过支持WASM，大量的存量代码都可以被重新编译为WASM模块，可以动态加载到web应用中，通过Javascript调用，而不需要再通过浏览器来支持。这也是WASM设计的主要场景。AutoCAD公司之前尝试过把 3D 设计工具使用web技术来实现，都失败了，因为大量物理引擎计算都是C/C++写的，如果用Javascript重写性能是不达标的。通过把这些物理模拟计算的C/C++库编译为WASM，性能问题得到解决，AutoCAD终于提供了基于web技术的设计工具，功能和原生版本相差无几。另外一个例子是，第一视角射击游戏的鼻祖DOOM最近被移植到了WASM环境（[https://wasm.continuation-labs.com/d3demo/](https://wasm.continuation-labs.com/d3demo/)），当你访问这个网址，基于WASM的DOOM游戏会被加载，其可玩性和性能都是不错的。Bullet、ODE、PhysX这样的高性能物理引擎也在重新编译为WASM，可以预见的未来基于web的游戏和AR/VR应用开发环境会出现可以和Unity、Unreal这样的商业游戏引擎一较高下的web版本。
 
 另一个值得关注是Python语言和其科学计算包对WASM的移植（[https://alpha.iodide.io/](https://alpha.iodide.io/)），python在ML/AI中被广泛使用，计算本身和前端的UI可以在浏览器中完全实现完美结合了web的连接性和原生的计算能力，会创造出全新的用户体验和场景。TensorFlow的移植也在进行中（[https://github.com/tensorflow/tfjs/tree/master/tfjs-backend-wasm](https://github.com/tensorflow/tfjs/tree/master/tfjs-backend-wasm）。
 
