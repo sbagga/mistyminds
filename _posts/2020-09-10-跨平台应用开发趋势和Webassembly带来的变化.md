@@ -5,6 +5,7 @@ categories: [web, mobile, app, webassembly, OS]
 comments_id: 6
 excerpt: 移动互联网应用已经发展10年有余，随着技术和商业环境的变化，业界对跨平台的universal app框架的需求越来越强烈，出现了React Native，Flutter, Weex这样的跨平台框架，随着W3C正式标准化Webassembly，Web又成为创新的核心，也是universal app实现的一个重要路径
 
+---
 
 秉持“Code once run everywhere” 理念的跨平台应用开发技术从移动应用诞生之始就一直有需求，也出现了cordova，react native，flutter，weex等开源的框架技术。除了代码共享，开发便利等因素，跨平台应用开发还存在其他一些更强烈的诉求。
 ##### 1、随着个人消费者设备逐渐增多，用户的手机，pad，pc，电视，手表，汽车，AR/VR设备等设备存在强烈统一用户体验，数据共享，无缝交互的需求。
