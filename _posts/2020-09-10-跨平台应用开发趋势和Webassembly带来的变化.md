@@ -28,7 +28,7 @@ Universal App的产品需求。参考云计算的12 factor app需求，有类似
 
 基于上述对Universal App的需求，首先回顾一下跨平台的app架构
 
-#### 基于HTML5的跨平台应用架构
+### 基于HTML5的跨平台应用架构
 在移动互联网发展的早期因为原生app生态不健全和开发者不多，通过把web应用打包为原生应用可以短期内大量提供移动应用和内容，体验上接近移动应用，所以还有不少的接受度。在架构上，Android和iOS都提供应用内嵌webview的能力，基于HTML5的混合应用运行在webview模式，和通过浏览器运行的纯粹web app不同的是，这种混合应用通过一些plugin能够访问原生的能力，例如：硬件外设的访问，地址本的访问等。另外，web应用的javascript代码，HTML/CSS代码和需要的资源可以打包作为应用分发，应用直接从本地文件系统加载这些代码和资源而不需要从网上下载，性能获得了提升。但是，本质上这个架构的性能依赖于浏览器，浏览器需要对web应用的HTML DOM和CSS做即时编译和渲染，而原生应用不需要，web应用使用javascript语言虽然是JIT编译，但是在多线程和语言设计上和原生语言存在差距，这些都导致了web应用性能落后于原生应用。
 
 
@@ -70,7 +70,7 @@ RN还开发了一种新的前后台数据交互的协议，取代传统REST API�
 ![Wechat mini app](../images/WXAPP.png)
 
 
-#### 基于自带组件的跨平台架构
+### 基于自带组件的跨平台架构
 
 
 Google开源的flutter 框架是另一个跨平台应用框架，借鉴了react项目的很多设计，例如声明式的组件编程，在flutter里面叫做widget，单向数据流MVVM 状态管理等，但是也有重大的区别。首先flutter使用dart语言开发，其次flutter实现了自己的渲染引擎，而不依赖于原生平台提供的组件。从架构上，flutter类似于unity这样的游戏引擎，因为游戏的开发流程和渲染需求和移动应用差异很大，所以游戏引擎通过自己在原生平台的构建的runtime完成渲染和应用框架，游戏应用和游戏引擎runtime最终编译到一起，作为原生平台的一个AOT（Ahead of Time）编译成的machine code部署。在flutter框架下也是如此，flutter有针对Android，iOS和web实现的runtime，runtime提供了widget库，应用框架，渲染引擎，dart VM或者是dart 语言runtime，以及访问原生能力的API实现，flutter应用必须加载到这个runtime上才能在原生平台运行，应用开发阶段应用运行在flutter提供的一个shell内，这个shell提供了dart VM和其他一些开发支持，应用发布的时候回通过AOT编译为machine code，在Android平台编译为NDK代码，然后通过一个Android应用的runner加载，在iOS平台，编译为LLVM target，也通过一个iOS应用的runner加载。在运行过程中，应用的界面渲染，用户输入管理都被Runner分配给flutter应用代码处理。
@@ -108,6 +108,7 @@ Flutter Web 使用Webassembly编译	过的Skia图形引擎实现了在web浏览�
 ![Univeral App](../images/unviersalapp.png)
 
 
+
  1. 基于组件化的应用开发方式，这也是软件开发的一般理念，组件封装可以让前端开发变为堆积木，大公司内部经过多年的发展已经形成了高度可跨平台重用的组件仓库，基于流行前端框架的开源和商业组件库也已经形成气候。如上文（https://mistyminds.github.io/mistyminds/%E6%96%B0%E4%B8%80%E4%BB%A3%E7%9A%84app%E5%BC%80%E5%8F%91/）介绍的内容，基于DSL语言描述的声明式组件已经被iOS，Android和其他前端开源框架所采用。这里不再赘述。
 
  2．前端应用框架也都基本采用了MVVM的交互模式，通过统一全局状态管理来管理用户输入和数据更新导致的UI更新，不管是React，Flutter，Vue这样的开源框架还是iOS和Android，都在这个架构上获得了共识。
@@ -118,7 +119,7 @@ Flutter Web 使用Webassembly编译	过的Skia图形引擎实现了在web浏览�
 
  5．在编程语言层面，JavaScript因为其广大的社区，还是最受欢迎和上手最快的前端语言。Flutter虽然有很多技术优势，但是其DART语言的选择是其生态薄弱的一个主要原因。JavaScript作为一种解释性语言，天生存在性能缺陷，例如不能AOT。要开发出DART这样既能以VM方式工作又能编译为machine code runtime的前端编程语言门槛很高。Webassembly的出现为编程语言选择提供了巨大空间，不管是是使用既有语言还是开发新的轻量级UI语言，门槛都被降低了。
 
-6．图形渲染引擎方面，Skia在2D渲染上占有绝对的优势，通过flutter项目，Skia也证明了其跨越mobile和web的能力。图形引擎和上端的部件描述语言和状态管理一起联合设计，可以获得不少优化空间。
+ 6．图形渲染引擎方面，Skia在2D渲染上占有绝对的优势，通过flutter项目，Skia也证明了其跨越mobile和web的能力。图形引擎和上端的部件描述语言和状态管理一起联合设计，可以获得不少优化空间。
 
 
 从上述对跨平台应用框架的分析，还可以看出， iOS和Android提供的原生开发工具，应用框架和开发流程本身不适合大公司的需求，大量的应用框架层的创新都是大互联网公司从其业务和开发团队实际需求出发开发出来的，从用户体验上比iOS和Android原生的应用开发工具和流程更适合开发者的需求，Android Studio和Xcode 的开发体验难以匹敌RN或者Flutter提供的支持live reload和团队协作能力的开发工具，更没有提供组件全生命周期管理，设计师和开发者可以紧密协作开发和维护组件的工具平台。两大移动平台因为垄断带来的自满和倦怠显露无疑，新的移动平台可以考虑通过和开源框架生态全面合作，通过底层平台能力和上层开源框架的全面适配而提供给开发者更好的开发体验，全面融合硬件能力，在保证用户隐私和安全的情况下，尽可能扩展开发者可以创新的空间。
@@ -151,7 +152,7 @@ Flutter Web 使用Webassembly编译	过的Skia图形引擎实现了在web浏览�
 上述Webassembly带来的变化让跨平台应用开发变得更高性能，高效，和更加安全。下图是一个基于Webassembly的Universal App框架的构想，可以同时支持2D和3D应用，可以支持浏览器内运行或者是原生平台运行。其中基于WASM可以提供大量的系统服务，例如HMS很多能力可以通过WASM提供。这些服务和用户的代码通过Nano Process集成。在图形接口方面，Mozilla正在开发基于RUST的WGPU接口，底层对接WebGPU或者其他图形API。
 
 
-#### 重点领域
+### 重点领域
  * Swift, Java/Kotlin 到wasm的编译器，这样可以enable 大量的应用迁移，借鉴flutter，有可能在wasm层面实现android的组件，但是重点需要解决java/kotlin的编译器性能，因为Android应用框架和组件基于java实现，当然也可以通过支持swift/object C++实现对iOS component的支持，支持swift开发者迁移iOS应用到web。
  * 在UI组件编程领域，JavaScript有很大生态，容易上手，但是性能有问题，JavaScript目前还没有编译为Webassembly。AssemblyScript是一个大量借鉴了TypeScript，TypeScript是经过strong type改造的JavaScript，但是也考虑了方便编译为Webassembly的新语言，比直接写Webassembly更友好，编译到Webassembly性能损失又比较小。可能会作为JavaScript的替换。
  * 及早介入WASI的标准制定和开发，WASI对WASM模块相互集成，OS抽象和安全集成非常重要。
