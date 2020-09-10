@@ -108,14 +108,20 @@ Flutter Web 使用Webassembly编译	过的Skia图形引擎实现了在web浏览�
  5.	一些跨平台框架和super app可以通过Webassembly提供基于其生态的新应用分发，例如：微信小程序，inoic，react生态中的开发平台，试图在app store提供平台类的应用服务，但是其商业模式和app store冲突，所以纷纷被下架，只有微信因为体量太大得到了豁免，这些平台可以基于Webassembly构建“OS” in browser，形成基于浏览器的应用开发和分发平台，而不用担心被app store下架。
 
 
+如上述跨平台的Universal App框架的分析，编程语言的性能和语言的相互集成能力是限制应用性能的重要因素。Webassembly带来的变化可以总结如下
+ 1.	允许应用框架使用不同的语言来解决不同性质的问题。例如：面向开发者的语言，例如组件描述，更强调对组件的准确描述和用户快速的上手能力。用户逻辑，可能涉及计算性能或者AI能力，需要能够很容易支持调用既有的计算库模块，甚至是异构计算能力，比如python开发的ML库，而图形渲染管线，涉及对内存和多进程并发的处理，可能更适合C++，RUST或Go这样的语言处理。通过Webassembly，应用框架具备了整合不同代码资产，允许用户使用不同的语言解决不同的问题，这是一个很大的突破。随着多线程，SIMD指令，动态链接等能力逐渐进入Webassembly， 高性能语言编译为Webassembly的性能损失会更小，这种优势越明显。
+ 2.	Webassembly Interface Type标准化了不同语言编译为WASM模块之后相互集成的数据相互调用标准，也允许不同语言的runtime调用WASM模组，框架可以有一个主要编程语言，例如：Java或Swift，但是通过WASI标准，可以调用WASM模块，进而可以使用大量的存量软件资产，目前语言之间的相互调用是通过各种私有接口实现的，例如：JNI。
+ 3.	WASI还在标准化WASM模块调用系统能力的API，和WASM模块之间集成的安全标准，基于WASI，Webassembly不仅可以运行在浏览器之内，也能通过non-web WASM runtime之间运行在OS之上，而在不同的运行环境，WASM模块都可以通过统一的WASI API访问系统能力。而WASI所带来的WASM之间集成的minimum authority安全接口，可以大幅度改进目前基于编程语言模块调用的安全问题。
+上述Webassembly带来的变化让跨平台应用开发变得更高性能，高效，和更加安全。下图是一个基于Webassembly的Universal App框架的构想，可以同时支持2D和3D应用，可以支持浏览器内运行或者是原生平台运行。其中基于WASM可以提供大量的系统服务，例如HMS很多能力可以通过WASM提供。这些服务和用户的代码通过Nano Process集成。在图形接口方面，Mozilla正在开发基于RUST的WGPU接口，底层对接WebGPU或者其他图形API。
 
 
-重点投资领域
+#### 重点领域
+ * Swift, Java/Kotlin 到wasm的编译器，这样可以enable 大量的应用迁移，借鉴flutter，有可能在wasm层面实现android的组件，但是重点需要解决java/kotlin的编译器性能，因为Android应用框架和组件基于java实现，当然也可以通过支持swift/object C++实现对iOS component的支持，支持swift开发者迁移iOS应用到web。
+ * 在UI组件编程领域，JavaScript有很大生态，容易上手，但是性能有问题，JavaScript目前还没有编译为Webassembly。AssemblyScript是一个大量借鉴了TypeScript，TypeScript是经过strong type改造的JavaScript，但是也考虑了方便编译为Webassembly的新语言，比直接写Webassembly更友好，编译到Webassembly性能损失又比较小。可能会作为JavaScript的替换。
+ * 及早介入WASI的标准制定和开发，WASI对WASM模块相互集成，OS抽象和安全集成非常重要。
+ * 在graphics render领域，WebGPU既是浏览器内的GPU接口标准，也支持native环境，全面开放了大量现代GPU的能力，例如：ray tracking，PBR，也提供访问GGPU编程环境的能力，未来图形引擎要很好平衡CPU和GPU render，通过RUST语言来构建新的图形渲染能力也有很多投入，RUST比C++安全高效，Mozilla开发RUST的初衷就是做并行化的渲染。目前Mozilla基于RUST的WGPU渲染引擎，是Webassembly访问图形接口的重要开源项目。
+ * 在物理引擎领域，bullet和physx引擎已经编译为Webassembly，结合其他高性能的图形引擎，出现了例如babylonjs这样的基于web的游戏/webXR引擎，这个领域的领先生态将会挑战Unity的在移动游戏和 AR/VR领域的领导地位
 
-Graphics engine，flutter，但是开放语言接口，定义组件render和app框架的界面，new web
-Swift, Java/Kotlin 到wasm的编译器，这样可以enable 大量的应用迁移，借鉴flutter，有可能在wasm层面实现android的组件，但是重点需要解决java/kotlin的编译器性能，因为android应用框架和组件基于java实现，当然也可以通过支持swift/object C++实现对iOS component的支持，支持swift开发者迁移iOS应用到web
-游戏引擎，3D web, spatial web computing领域，这是新的机会点
-Assemblyscript, rust 语言，或者借鉴typescript和javascript同时很wasm friendly的新语言，python？？
 
 
 
