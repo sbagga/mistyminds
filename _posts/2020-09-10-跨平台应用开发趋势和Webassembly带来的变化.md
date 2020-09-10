@@ -105,7 +105,7 @@ Flutter Web 使用Webassembly编译	过的Skia图形引擎实现了在web浏览�
 
 对上述跨平台应用框架的分析可以总结出一些共有的特性，如下图，有共性的总结
  
-![Univeral App](../images/univeralapp.png)
+![Univeral App](../images/unviersalapp.png)
 
 
 1．	基于组件化的应用开发方式，这也是软件开发的一般理念，组件封装可以让前端开发变为堆积木，大公司内部经过多年的发展已经形成了高度可跨平台重用的组件仓库，基于流行前端框架的开源和商业组件库也已经形成气候。如上文（https://mistyminds.github.io/mistyminds/%E6%96%B0%E4%B8%80%E4%BB%A3%E7%9A%84app%E5%BC%80%E5%8F%91/）介绍的内容，基于DSL语言描述的声明式组件已经被iOS，Android和其他前端开源框架所采用。这里不再赘述。
