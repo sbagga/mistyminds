@@ -85,7 +85,7 @@ Flutter的widget声明式描述，借鉴了JSX，使用dart用单一文件描述
 
 Flutter也使用单向数据流更新UI的MVVM模式，有不同的开源框架实现对组件和页面状态的管理。
 
-![Flutter State](../images/flutterstate.png)
+![Flutter State](../images/fluterstate.png)
 
 
 Flutter Web 在2020年初发布，真正实现了code once run everywhere的目标，这个实现中的render有两个路径，一个是使用浏览器的渲染通路，使用基于HTML/CSS的widget实现，类似于RN web，好处是因为并不下发flutter render代码，所以代码尺寸小，首页显示快，另一个渲染路径使用编译为Webassembly的Skia渲染引擎，称为CanvasKit，和在原生平台实现基本一致，这样也可以重用在原生平台使用的widget，性能也会比使用HTML/CSS渲染的方式更高。在flutter web实现中，dart语言通过dart2js编译为JavaScript代码，在浏览器的JavaScript VM运行。
