@@ -71,7 +71,10 @@ WASM和Rust 设计的初衷都是为了解决浏览器的痛点，Rust语言替�
 
 ## WASM带来OS领域创新机会
 WASM对C/C++语言无论是性能还是相互集成能力都有很好的支持。在OS领域，C/C++是绝对主力的开发语言，但是因为C/C++与生俱来的undefined behavior，是开发者的一把双刃剑，既可以提供非常高的性能，但是也带来安全隐患，WASM为C/C++代码构筑了一道安全屏障，通过WASM包装，C/C++代码可以以更安全的方式运行，在OS领域，就出现了几种可能性。
+
 一种是在Linux kernel运行WASM，提供了在kernel动态运行user code的可能性，Kernel已经支持eBPF，用户可以在kernel内运行数据包过滤的脚本代码，极大提升了网络性能，WASM则可以提供比eBPF更安全的sandbox和完整的用户代码运行能力，即用户可以动态加载WASM bytecode到kernel的WASM runtime运行。因为在kernel运行系统服务和设备驱动的效率比在user space 高20-30%，尤其涉及到大流量的数据流处理的业务，在kernel内之间处理数据效率会更高。使用kernel线程机制，也能让WASM代码对kernel主线程的影响变得更小，从而WASM用户程序可以获得更多的自由度。已经由开源项目证实了在Linux Kernel运行WASM的可行性（https://github.com/wasmerio/kernel-wasm）。通过WASM在Linux Kernel运行user land 应用，进一步扩大了Linux的使用场景，比如：提升了高数据吞吐量，高实时业务场景下的竞争力。
+
 另一种用法，是把Linux kernel的代码打包运行在WASM中，相当于为Linux Kernel提供了代码模块之间的隔离机制，带来了micro kernel的一些优点。
+
 同时Rust也越来越多的用于OS的开发，例如TockOS，Theseus等项目，Fuchsia也在用Rust重新Go和C实现的模块，他们充分利用了Rust的内存安全机制和模块化代码，实现高性能、安全可信的OS。在这些Micro Kernel架构中，引入WASM封装模块运行是一个可行的步骤，已经出现了早期的尝试（https://github.com/nebulet/nebulet）。 
 
