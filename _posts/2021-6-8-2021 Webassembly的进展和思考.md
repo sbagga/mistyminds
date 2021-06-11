@@ -76,5 +76,5 @@ WASM对C/C++语言无论是性能还是相互集成能力都有很好的支持�
 
 另一种用法，是把Linux kernel的代码打包运行在WASM中，相当于为Linux Kernel提供了代码模块之间的隔离机制，带来了micro kernel的一些优点。
 
-同时Rust也越来越多的用于OS的开发，例如TockOS，Theseus等项目，Fuchsia也在用Rust重新Go和C实现的模块，他们充分利用了Rust的内存安全机制和模块化代码，实现高性能、安全可信的OS。在这些Micro Kernel架构中，引入WASM封装模块运行是一个可行的步骤，已经出现了早期的尝试（https://github.com/nebulet/nebulet）。 
+同时Rust也越来越多的用于新一代OS的开发，例如TockOS，Theseus等项目，Fuchsia也在用Rust重写Go和C实现的模块，他们充分利用了Rust的内存安全机制和模块化代码，实现高性能、安全可信的OS。在这些Micro Kernel架构中，引入WASM封装模块运行是一个可行的步骤，已经出现了早期的尝试（https://github.com/nebulet/nebulet）。 
 
