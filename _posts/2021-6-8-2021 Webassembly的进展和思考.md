@@ -1,10 +1,13 @@
 ---
 layout: post
-title:  2021 Webassembly的进展和思考
-categories: [web, cloud, edge, OS, CPU, compiler, Programming language]
-comments_id:8
-excerpt: Webassembly在2020和2021年进入高速发展期，在很广泛的领域出现了很有意思的use case，本文试图总结2021年Webassembly技术的发展趋势和一些思考
+title:  从ERI看半导体产业下一个10年的发展趋势
+categories: [SDH, DSSoC, CHIPLET, Semiconductor, EDA]
+comments_id: 4
+excerpt: 随着半导体高端制程越来越昂贵，其进步已经难以惠及多数的产业公司，产业面临拜托对制程技术的路径依赖，需要探索其他方式继续延伸摩尔定律，DARPA电子复兴计划也切合业界的诉求，提出了对未来半导体技术影响重大的技术规划，包括计算机体系架构的变化，EDA设计工具的变化以及通过封装技术和新材料使用带来的变革，这些前瞻性的规划和基础研究对半导体产业未来10年将会起到重要的引导。
+
+
 ---
+
 
 ## WASM标准和应用实现实现良性循环
 
