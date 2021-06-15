@@ -39,18 +39,37 @@ WASM作为被广泛采纳的语言标准，在几乎所有的CPU和操作系统�
 随着WASM的标准化和在浏览器环境的完善支持，bytecode alliance，wasmer等non-web WASM项目的进展，开源社区已经探索出很多WASM的用例。
 
 ## 面向消费者的应用
-在面向消费者应用的领域，加入WASM的支持使得浏览器又获得了新生。前文已经对这个趋势做了分析（https://github.com/mistyminds/mistyminds/blob/master/_posts/2020-09-10-%E8%B7%A8%E5%B9%B3%E5%8F%B0%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E8%B6%8B%E5%8A%BF%E5%92%8CWebassembly%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%8F%98%E5%8C%96.md）
+在面向消费者应用的领域，加入WASM的支持使得浏览器又获得了新生。前文已经对这个趋势做了分析
+
 
 简单总结如下
 
 ### 浏览器web app
+
+https://github.com/mistyminds/mistyminds/blob/master/_posts/2020-04-28-Webassembly-%E5%B8%A6%E6%9D%A5%E7%9A%84%E6%96%B0%E8%AE%A1%E7%AE%97%E5%B9%B3%E5%8F%B0.md
+
 在浏览器中通过WASM实现计算密集模块，也可以构建更精简的GUI能力，运行具备桌面性能的大型应用，例如：autodesk studio
-### 跨平台分发的游戏平台
+
+### 跨平台分发的游戏平台和webCXR浏览器
+
+https://github.com/mistyminds/mistyminds/blob/master/_posts/2020-04-29-%E5%9F%BA%E4%BA%8E%E5%BC%80%E6%94%BEWeb%E6%8A%80%E6%9C%AF%E7%9A%84ARVR%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E5%B9%B3%E5%8F%B0.md
+
 可以通过WASM运行基于C/C++的游戏引擎，通过浏览器以web app方式分发游戏。Unity这样的游戏引擎有自己的跨平台runtime实现跨平台的分发，这也是unity的一大优势，但是相比WASM，其性能和开放性都有局限性。WASM出现降低了游戏平台跨平台分发的技术门槛，有利于新的游戏引擎和unity竞争。
+
+XR应用代表了消费者业务发展的未来，WebXR标准受制于2D浏览器的实现和生态，对XR的硬件和生态创新不利。可以围绕WASM构筑全新的面向3D XR应用的新的浏览器，浏览器下沉为计算机，游戏引擎，XR应用框架可以基于WASM技术构建
+
+
 ### 跨平台的app平台
+https://github.com/mistyminds/mistyminds/blob/master/_posts/2020-09-10-%E8%B7%A8%E5%B9%B3%E5%8F%B0%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E8%B6%8B%E5%8A%BF%E5%92%8CWebassembly%E5%B8%A6%E6%9D%A5%E7%9A%84%E5%8F%98%E5%8C%96.md
+
 基于HTML/CSS渲染能力的web app和原生app的差距主要体现在2D渲染能力上，WASM允许构建一套不依赖于HTML/CSS的渲染管线和GUI框架，例如：Skia可以移植到WASM中运行，带来桌面级的2D图形性能。Google的flutter  engine基于Skia图形库构建了一套可以跨桌面，移动和web浏览器的统一UI框架，真正实现了具备一致体验的跨平台App。
-### 小程序
+
+### 小程序 
+https://github.com/mistyminds/mistyminds/blob/master/_posts/2020-07-27-%E6%96%B0%E4%B8%80%E4%BB%A3%E7%9A%84app%E5%BC%80%E5%8F%91.md
+
 以微信+微信小程序代表的super app生态的崛起，带来了在App中内嵌第三方App的需求，当前的小程序基本基于浏览器web app方式开发，浏览器主要提供了安全运行sandbox，和基于HTML/CSS的渲染能力，缺点是浏览器本身很庞大，性能也不高，小程序难以运行带媒体业务这样计算密集业务。基于WASM可以构建跨平台的小程序框架，可以直接和super app集成，安全高效运行第三方的业务，尤其是AR/VR和游戏类的计算密集型的小程序。
+
+
 
 ## 面向云计算的应用场景
 WASM是可以和container对标的一种软件隔离技术，但是因为WASM并不一定使用Linux的process作为基本隔离手段，所以相比container，WASM对内存和CPU资源的占用要少很多，在同样的计算平台上可以实现更高的计算密度，在很多企业私有FaaS应用中，并不需要运行不被信任的第三方代码，对隔离的要求比较低，WASM可以替代container使用，达到更高的计算密度和更快的启动速度。
