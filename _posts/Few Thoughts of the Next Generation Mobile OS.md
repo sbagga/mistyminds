@@ -57,8 +57,8 @@ Rust 语言带来并行并发系统开发的弯道超车的机会
 * 基于future实现的Async/Await被编译器静态展开为有限状态机，避免运行时动态申请内存的开销
 * 语言核心特性严格管理，通过traits扩展功能（inheritance vs composition，C++ OOP失败的设计），形成良好内核抽象稳定、library生态活跃创新的格局，Chris Lattner特别强调的small things that compose的格局，避免了微软 fiber，Apple GCD等中心化创新的困境（无法通过大规模试验获取经验，迭代创新），出现了tokio这样的活跃library生态
 2. Rust进入操作系统
-* Rust正式成为Linux Kernel的开发语言，关键的kenrl library会重写，是增大kernel话语权的机会
-* Rust提供的基于软件task的异步并发特性被用于domain specific的library开发。例如：tokio，lunatic，这些library runtime提供了用户态的基于软件task的调度和管理能力，比OS的线程调度机制更为高效
+* Rust正式成为Linux Kernel的开发语言，关键的kernel library会重写，包括ISRG Prossimo(https://www.memorysafety.org/about/)项目赞助的使用Rust重写Linux Kernel和关键library（TLS，NTP等），OpenSSF提出的用安全语言（Rust，Go）重写C/C++b编写的基础软件的项目，是增大kernel话语权的机会。
+* Rust提供的基于软件task的异步并发特性被用于domain specific的library开发。例如：tokio，lunatic，这些library runtime提供了用户态的基于软件task的调度和管理能力，比OS的线程调度机制内存占用少、任务调度代价低，例如：OS的支持的thread只有几千个，而runtime可以调度的软件task可以达到10万以上，在domain问题领域能更为高效的利用硬件资源，
 * 基于Rust开发的新型OS，例如：theseus OS利用Rust zero-overhead abstraction带来的内存隔离，摆脱了传统OS通过kernel和用户态的内存隔离，用户态进程之间的虚拟内存隔离带来的开销，实现了single address space的内存使用机制
 * 基于Rust开发的应用I/O Kernel，例如：quark，配合Linux Kernel的新异步I/O机制IO_URING实现了高性能的I/O虚拟化
 
@@ -68,7 +68,7 @@ Rust 语言带来并行并发系统开发的弯道超车的机会
 ![](https://i.imgur.com/D46NvXT.png)
 
 
-综上所述，Rust zero-overhead abstraction 的设计理念强力支持了OS开发需要的安全、可靠、高效、高性能等需求，实现了对C/C++的跨代式超越，无论在Linux还是其他OS领域都会获得快速支持，是改变既有OS格局的重要武器。Rust提供的内存ownership模式，改变了操作系统传统基于硬件或者runtime实现的资源隔离，同时提供安全可靠和有优秀用户体验的异步并发软件开发能力，可以在实现从OS到应用层的全栈异步并行开发，为颠覆性的OS创新提供了沃土。
+综上所述，Rust zero-overhead abstraction 的设计理念强力支持了OS开发需要的安全、可靠、高效、高性能等需求，实现了对C/C++的跨代式超越，无论在Linux还是新型OS领域都会获得大量使用，是改变既有OS格局的重要武器。Rust提供的内存ownership模式，改变了操作系统传统基于硬件或者runtime实现的资源隔离，同时提供安全可靠和有优秀用户体验的异步并发软件开发能力，可以实现从OS到应用层的全栈异步并行开发，已经证明可以更加有效利用多核处理器，为颠覆性的OS创新提供了沃土。
 
 
 ## 基于Rust的实现的Super Runtime
@@ -117,3 +117,17 @@ Rust 语言带来并行并发系统开发的弯道超车的机会
     * 需要替换runtime的task scheduler，由theseus runtime统一管理task调度？可行性？因为TR接管了linker，可以让不同的app共享library？library必须是stateless的
     * TR需要设计新的scheduler，由不同的调度策略需要实现，重用tokio的task scheduler设计，前台任务和后台任务的调度，QoS优先级
     * App之间的API通信机制，基于library？
+
+## 基于Rust的实现的App开发框架
+
+前端UI框架也是async使用的主要场景，虽然这个领域因为Rust学习曲线较为陡峭，生态发展相对较慢，但是也出现了比较有特色的UIKit和App开发框架，这些框架也有鲜明的Rust生态的模块化可组合的鲜明特点，而且因为Rust是系统编程语言，这些框架也可以实现跨平台App开发。第一种思路是利用web生态，通过webview来渲染基于vue，react这样的前端框架产生的页面，tauri提供了对平台webview和window管理的抽象，提供了前端webview和后台事件业务处理直接的消息桥梁，后端可以和yew或者deno这样的异步应用框架对接，一个web app可以较好的映射到tauri的应用框架。Tauri相比elctron这样的跨平台App框架的优势在于，Tauri利用了原生平台的webview能力，后端也可以plugin不同的async应用开发框架，所以无论在尺寸和扩展性上都比Electron这种自带chromium webview和nodejs的方案要好。
+
+
+![](https://i.imgur.com/u8flvKB.png)
+
+Servo是Mozilla使用Rust开发的浏览器内核，也是当初创造Rust语言的第一个需求，Servo内部使用了Rust的内存安全和并发安全机制，实现了异步并行的CSS/HTML解析和渲染管线，而且起模块化的设计非常适合作为嵌入式webview引擎。Tauri也计划和Servo做集成，这样Tauri可以选择和Servo一起分发，解决使用平台webview带来的渲染效果不一致的问题。
+
+Makepad是一款Rust语言开发的模块化和高性能的UIKit，和React JSX或者SWiftUI这样的前端DSL一样，Makepad也有Makepad UI DSL，可以描述UI组件和页面布局，不同的地方是Makepad的DSL充分兼容了figma这样的前端设计工具的语法，这样很容易把设计师通过设计工具产生的UI设计转化为Makepad UI DSL，南向，Makepad的DSL可以动态被编译为GPU的shader language，通过GPU实时渲染出页面，这样可以直接通过修改和更新Makepad UI DSL实现对UI的实时修改。通过直接调用GPU的shader能力做渲染，可以同时支持2D和3D图形渲染，具有很好的前瞻性。Makepad这种直接通过GPU渲染的方式称为Direct Mode，它的优点是渲染任务完全卸载给GPU，不占用CPU资源，传统2D图形库充分利用了2D UI具有很多局部变化的特点，对渲染页面做了内存优化，以大幅度减少需要渲染的工作量，这种方式叫做retained mode，Makepad实现中也借鉴了retained mode，减少过多使用GPU带来的功耗问题，
+
+![](https://i.imgur.com/vdc20Zo.png)
+
