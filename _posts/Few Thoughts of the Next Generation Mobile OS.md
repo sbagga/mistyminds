@@ -62,6 +62,11 @@ Rust 语言带来并行并发系统开发的弯道超车的机会
 * 基于Rust开发的新型OS，例如：theseus OS利用Rust zero-overhead abstraction带来的内存隔离，摆脱了传统OS通过kernel和用户态的内存隔离，用户态进程之间的虚拟内存隔离带来的开销，实现了single address space的内存使用机制
 * 基于Rust开发的应用I/O Kernel，例如：quark，配合Linux Kernel的新异步I/O机制IO_URING实现了高性能的I/O虚拟化
 
+![](https://i.imgur.com/vfOq1j6.png)
+
+
+![](https://i.imgur.com/D46NvXT.png)
+
 
 综上所述，Rust zero-overhead abstraction 的设计理念强力支持了OS开发需要的安全、可靠、高效、高性能等需求，实现了对C/C++的跨代式超越，无论在Linux还是其他OS领域都会获得快速支持，是改变既有OS格局的重要武器。Rust提供的内存ownership模式，改变了操作系统传统基于硬件或者runtime实现的资源隔离，同时提供安全可靠和有优秀用户体验的异步并发软件开发能力，可以在实现从OS到应用层的全栈异步并行开发，为颠覆性的OS创新提供了沃土。
 
