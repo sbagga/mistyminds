@@ -56,9 +56,58 @@ Rust 语言带来并行并发系统开发的弯道超车的机会
 * 内置并行并发特性，共享内存的场景使用严格受控，避免无必要的内存锁设计造成的性能损失
 * 基于future实现的Async/Await被编译器静态展开为有限状态机，避免运行时动态申请内存的开销
 * 语言核心特性严格管理，通过traits扩展功能（inheritance vs composition，C++ OOP失败的设计），形成良好内核抽象稳定、library生态活跃创新的格局，Chris Lattner特别强调的small things that compose的格局，避免了微软 fiber，Apple GCD等中心化创新的困境（无法通过大规模试验获取经验，迭代创新），出现了tokio这样的活跃library生态
-2. Rust进入操作系统
+
+
+2. 基于Rust的异步并发的Runtime生态创新极其活跃
+
+Christ Lattner列出的三种并发并行控制流，在Rust生态都有对应的项目
+* 异步并发控制流：Rust在2019年发布的1.39版正式内置了Async/Await语义。
+
+如下表所示，async/await已经被主流编程语言内置支持，成为异步并发应用编写的标准。
+
+
+Rust提供的基于软件task的异步并发特性被用于domain specific的library开发。例如：tokio，lunatic，这些library runtime提供了用户态的基于软件task的调度和管理能力，比OS的线程调度机制内存占用少、任务调度代价低，例如：OS的支持的thread只有几千个，而runtime可以调度的软件task可以达到10万以上，在domain问题领域能更为高效的利用硬件资源。
+https://kerkour.com/cooperative-vs-preemptive-scheduling
+
+| ation          | async            | thread           |
+|----------------|------------------|------------------|
+| Creation       | 0.3 microseconds | 17 microseconds  |
+| Context switch | 0.2 microseconds | 1.7 microseconds |
+
+
+相比其他语言实现的Aysnc/Await，Rust的Async/Await由编译器直接转化为state machine，提前划分了内存，所以并不需要特别的runtime支持，即所谓的zero-overhead。
+
+https://shahbhat.medium.com/structured-concurrency-in-modern-programming-languages-part-iv-kotlin-and-swift-7bf0e08de1dd
+
+
+
+| Feature                                 |      Typescript (NodeJS)      |                         GO                        |                                              Rust |                       Kotlin                      |                                             Swift |
+|-----------------------------------------|:-----------------------------:|:-------------------------------------------------:|--------------------------------------------------:|:-------------------------------------------------:|--------------------------------------------------:|
+| Structured scope                        |            Built-in           |                      manually                     |                                          Built-in |                      Built-in                     |                                          Built-in |
+| Asynchronous Composition                |              Yes              |                         No                        |                                               Yes |                        Yes                        |                                               Yes |
+| Error Handling                          |   Natively using Exceptions   |        Manually storing errors in Response        |                         Manually using Result ADT |             Natively using Exceptions             |                         Natively using Exceptions |
+| Cancellation                            |    Cooperative Cancellation   | Built-in Cancellation or Cooperative Cancellation | Built-in Cancellation or Cooperative Cancellation | Built-in Cancellation or Cooperative Cancellation | Built-in Cancellation or Cooperative Cancellation |
+| Timeout                                 |               No              |                        Yes                        |                                               Yes |                        Yes                        |                                               Yes |
+| Customized Execution Context            |               No              |                         No                        |                                                No |                        Yes                        |                                               Yes |
+| Race Conditions                         | No due to NodeJS architecture |            Possible due to shared state           |                        No due to strong ownership |            Possible due to shared state           |                      Possible due to shared state |
+| Value Types                             |               No              |                        Yes                        |                                               Yes |                        Yes                        |                                               Yes |
+| Concurrency paradigms                   |           Event loop          |              Go-routine, CSP channels             |                              OS-Thread, coroutine |         OS-Thread, coroutine, CSP channels        |     OS-Thread, GCD queues, coroutine, Actor model |
+| Type Checking                           |             Static            |             Static but lacks generics             |               Strongly static types with generics |        Strongly static types with generics        |               Strongly static types with generics |
+| Suspends Async code using Continuations |               No              |                         No                        |                                               Yes |                        Yes                        |                                               Yes |
+| Zero-cost based abstraction ( async)    |               No              |                         No                        |                                               Yes |                         No                        |                                                No |
+| Memory Management                       |               GC              |                         GC                        |            (Automated) Reference counting, Boxing |                         GC                        |                      Automated reference counting |
+
+* 消息传递和数据隔离：级所谓的actor模式。
+
+Rust内置支持msg channel概念，例如MPSC channel。生态中，Lunatic runtime试图对标goroutine实现完整的actor模式和preemtive任务调度系统。Rust最初的版本包括preemptive调度的green task特性，非常类似Microsoft的用户态任务调度体系Fiber，后续版本删除了这个特性，因为希望由生态runtime Library来实现，而不需要在语言层实现。
+
+* 分布式数据和计算
+
+Rust的Ryaon并行计算库。
+
+
+3. Rust进入操作系统。即将成为开发OS的主要语言
 * Rust正式成为Linux Kernel的开发语言，关键的kernel library会重写，包括ISRG Prossimo(https://www.memorysafety.org/about/)项目赞助的使用Rust重写Linux Kernel和关键library（TLS，NTP等），OpenSSF提出的用安全语言（Rust，Go）重写C/C++b编写的基础软件的项目，是增大kernel话语权的机会。
-* Rust提供的基于软件task的异步并发特性被用于domain specific的library开发。例如：tokio，lunatic，这些library runtime提供了用户态的基于软件task的调度和管理能力，比OS的线程调度机制内存占用少、任务调度代价低，例如：OS的支持的thread只有几千个，而runtime可以调度的软件task可以达到10万以上，在domain问题领域能更为高效的利用硬件资源，
 * 基于Rust开发的新型OS，例如：theseus OS利用Rust zero-overhead abstraction带来的内存隔离，摆脱了传统OS通过kernel和用户态的内存隔离，用户态进程之间的虚拟内存隔离带来的开销，实现了single address space的内存使用机制
 * 基于Rust开发的应用I/O Kernel，例如：quark，配合Linux Kernel的新异步I/O机制IO_URING实现了高性能的I/O虚拟化
 
