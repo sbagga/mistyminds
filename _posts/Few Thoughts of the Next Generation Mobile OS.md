@@ -23,26 +23,57 @@ LLVM编译器和SWIFT语言的发明人Chris Lattner也系统阐述了这种异�
 
 ## 移动OS并行和并发的场景(需求)和趋势
 
+### 异步并发并行的概念
+* Concurrent - 并发
 
-移动OS的程序控制类型
+    * 任务可以交替执行（alternatively），计算目标是单处理器，计算任务是重复执行的低占空比（duty cycle，任务处理时间和任务周期时间的比值）计算
+    * 典型的并发应用是I/O，网络，数据库。文件系统等所谓的I/O bound任务，即任务的吞吐量取决于数据进出的流量，性能取决于计算系统的数据接口和内存带宽，平均每单位数据上的计算耗时占任务处理时间的比重低
+
+* Parallel - 并行
+    * 并行的计算目标是多个处理单元，可以是一个多核处理器，也可以是计算集群系统
+    * 典型的并行计算任务是数据处理，数据可以切分到不同的处理单元，不同单元数据处理的指令/程序类似。在处理器内部，DSP，GPU等支持SIMD（Single Instruction Multiple Data）的处理器是典型的可并行的处理器，在大数据处理里，map/reduce算法是典型的可大规模并行的数据处理算法。在AI/ML学习任务里，训练模型时候可以采取数据切分，模型切分，参数切分等并行化策略，也是典型的并行计算任务。
+* Asynchronous - 异步
+    * 和异步处理对应的是同步处理，同步程序的控制流是顺序执行的，上一条指令没有执行完之前不会执行下一条指令，异步程序的控制流不是顺序执行的，程序编写的先后顺序和程序执行的先后顺序不一致。
+    * 异步处理的困难主要是因为程序开发者如何描述异步处理的逻辑，因为传统的编程语言是配合单处理器，串行控制流硬件而设计的，例如：Fortune等，C语言等，程序员员编写的串行控制流就是硬件执行的顺序，是一致的。而现代处理器的处理速度非常快，而I/O设备的数据传输速度是一个从低速几KB/s到高速几百GB/s的巨大区间，处理器速度和I/O速度不匹配时，同步阻塞式I/O会浪费大量的处理能力。异步编程是为了解耦处理器处理速度和I/O数据传输速度，提高处理器的利用率。
+    * 异构并行处理器也是芯片技术发展的趋势，异构计算体系包含了不同处理速度的多核处理器的面向应用的加速器，控制程序对这些异构处理器的访问也是异步的，类似对I/O的访问，按照异构处理器处理速度及时提供数据流。
+
+### 移动OS的程序控制类型
 1. 传统的同步串行控制流程
-    * 大部分程序员熟悉的编程模式
-    * 难以利用并发并行硬件
+    * 大部分程序员熟悉的顺序执行的编程模式
+    * 移动应用对处理器功耗和利用效率有极高要求，移动应用有大量异步并行和并发的场景，串行编程和执行方式难以发挥底层的异步I/O和并行化异构处理器。
 2. 异步并发控制流程
-    * 异步编程方式破坏了程序的执行顺序，难以编写和调试，用户体验差
-    * Async/Await 成为业界共识，可以以串行方式写并发应用，主流语言均已支持（Swift，JS，Python，Kotlin，Rust），成为新的异步并发编程范式
-    * 主要用于解决事件触发机制的并发，包括：I/O访问，数据库访问，UI前端开发，2D并行图形渲染，游戏脚本开发
+    * 移动应用的异步计算场景包括：I/O访问，数据库访问，UI前端开发，2D并行图形渲染，游戏脚本开发等
+    * 异步编程方式破坏了程序的顺序执行顺序，必须引入新的语意来描述程序并发，数据同步，错误处理等问题，提供给用户调试异步应用的工具，解决异步并发应用难以编写和调试，用户体验差的问题。
+    * 不仅仅是用户程序，移动OS也需要重构，提供全异步的I/O模式的设备驱动程序，甚至内核完全使用异步并发并行的微内核方式编写，这样才能构成一个全异步并发的完整软件栈。
+    * Async/Await 成为异步并发程序的标准语意，可以以串行方式写并发应用，主流语言均已支持（Swift，JS，Python，Kotlin，Rust）。Async/Await的完整实现需要基于语言自带或者生态框架提供的任务调度机制实现。
 3. 消息传递和数据隔离
-    * 通过消息机制来实现数据隔离，避免数据并发访问，所谓的actor模式，是实现并发编程的另一种主流模式
+    * 主要解决带有共享的可改变内存状态的场景，例如：前端UI开发，高异步并行化的I/O bound和CPU bound得应用，例如：2D/3D渲染业务
+    * 通过消息机制来实现数据隔离，提供对共享状态的安全并发访问，所谓的actor模式，是实现并发编程的另一种主流模式
     * 发端于erlang语言，Go的最大特色就是实现了基于Actor的goroutine，取得了很好的效果，Swift也全面支持Actor，Rust通过channel机制支持
-    * 主要解决带有共享状态的场景，例如：前端UI开发
 4. 分布式数据和计算
-    * 主要是数据密集型的SIMD计算模式，解决数据切分，计算切分问题
     * 使用场景：音视频媒体处理、GPU图像处理、AI/ML，物理引擎等
+    * 主要是数据密集型的SIMD计算模式，解决数据切分，计算切分问题
+    * 通常这类问题可以通过声明式编程方式解决，即用户提供基于DAG等抽象数据结构的计算图，由Compiler和Runtime共同来完成数据的分割和任务的调度，例如：renderscript，taskgraph，halide等并行计算框架。
+
+### 异步并发软件框架的几个概念
+1. OS thread vs user space thread （green task）
 
 
+    * OS把多核处理器抽象为thread软件对象，并提供基于thread的异步并行并发的调度机制，例如：POSIX提供的pthread抽象
+    * OS提供支持异构并行并发的数据同步API，例如：POSIX的mutex，semaphore等原子操作
+    * OS提供select和epoll等事件驱动的I/O API，配合thread实现异步并发并行能力。
+    * 不同的编程语言都提供使用OS原生的异步并发并行能力的语言API，例如：POSIX API本身就是C语言实现的，
+    * 编程语言的功能是是提供给开发者一个安全易用的异步并行并发语言表达和API，例如：函数调度为基于线程的异步执行，多线程函数之间的数据同步，线程的生命周期管理。
+    * C/C++之后发展出来的编程语言例如：java，C#，javascript，python都带有一个复杂的runtime，用于支持安全动态的内存使用，也能完整的控制用户程序运行行为，所以发展出了所谓的用户态线程和用户态的任务调度机制，为了区别 OS thread，这类用户态的thread一般称为green task（coroutine）。green task提供给用户和编程语言特性融合的多任务抽象，编程语言runtime则实现了green task到CPU thread的映射，这种映射可以是1:1映射，即green task不会被调度到多于一个CPU thread，也可以是N:M模式，即green task可以被调度到多于一个CPU thread上运行。Runtime的映射策略可以是静态的也可以是动态的。
 
-## Mobile Rust构想
+* preemptive vs cooperative, stackful vs stackless task
+    * 语言Runtime实现green task的调度有两种策略，一种是协作式的（cooperative），即green task的运行不会被Runtime打断，会一直运行到结束为止，即run to complete模式，这种情况下Runtime不需要为green task做function stack的完全备份和恢复，因为任务总是会正常退出的，这样runtime得设计会比较简单，缺点是green task必须自觉把CPU让出给Runtime（yield），如果不让出，任务可以一直运行，导致其他任务得不到运行时间。而且在需要保证任务实时QoS的情况下，Runtime如果不能随时切换green task，则不能保证任务的QoS。
+    * 另一种是抢夺式的任务调度（preemptive），即Runtime可以随时中断当前运行的green task，置换为另一个green task运行，即stackful runtime。因此，Runtime需要对green task的function stack做备份和恢复，Runtime可以直接利用OS thread能力（作为cooperative task scheduling的补充），也可以实现自己的用户态的stack，设计的重点是如何实现dynamic stack growth，即如何最经济的使用stack空间，运行比OS thread更多的green task，例如：Linux 的thread stack缺省是8MB，在用户设备上最多实现1000-2000个thread，而goroutine的stack则是8KB起，这样goroutine的task密度是Linux thread的1000倍，比较小的stack size也意味着更快的任务切换时间，更好的计算利用率。
+* language idiom and runtime
+    * 编程语言提供的join/fork，async/await，actor等语意的目的都是为开发者提供更好的人机交互（ergonomics），而且也逐渐形成了业界通行的标准，任何一个新的语言都需要考虑兼容这些语言设计上的事实标准
+    * 语言实现这些语意需要编译器和runtime的配合，甚至需要进一步提供异步的设备驱动和协议栈实现，才能真正实现异步并发并行。Runtime因为在用户态实现，所以可以不依赖OS kernel的限制和约束，可以快速创新，是语言核心竞争力的体现。例如：go语言的goroutine基本借鉴了erlang相应的语言设计，但是其高性能核心是其runtime实现的N:M的preemptive scheduling，和HTTP等核心协议库。
+
+## Rust带来异步并行并发Mobile OS弯道超车的机会
 
 > 
 > C++ implementations obey the zero-overhead principle: What you don't use, you don't pay for [Stroustrup, 1994]. And further: What you do use, you couldn't hand code any better.
@@ -50,29 +81,32 @@ LLVM编译器和SWIFT语言的发明人Chris Lattner也系统阐述了这种异�
 > -- Stroustrup
 > 
 
-Rust 语言带来并行并发系统开发的弯道超车的机会
-1. zero-overhead abstraction，尽可能在编译时间优化，而不要付出运行时的代价
+
+1. ### zero-overhead abstraction，尽可能在编译时间优化，而不要付出运行时的代价
 * 内存ownership的机制实现内存不可能越界访问，因此运行时不需要做内存越界检查（C/C++没有这个特性，WASM必须付出运行时的代价）
 * 内置并行并发特性，共享内存的场景使用严格受控，避免无必要的内存锁设计造成的性能损失
 * 基于future实现的Async/Await被编译器静态展开为有限状态机，避免运行时动态申请内存的开销
 * 语言核心特性严格管理，通过traits扩展功能（inheritance vs composition，C++ OOP失败的设计），形成良好内核抽象稳定、library生态活跃创新的格局，Chris Lattner特别强调的small things that compose的格局，避免了微软 fiber，Apple GCD等中心化创新的困境（无法通过大规模试验获取经验，迭代创新），出现了tokio这样的活跃library生态
 
 
-2. 基于Rust的异步并发的Runtime生态创新极其活跃
+2. ### 基于Rust的异步并发的Runtime生态创新极其活跃
 
 Christ Lattner列出的三种并发并行控制流，在Rust生态都有对应的项目
 * 异步并发控制流：Rust在2019年发布的1.39版正式内置了Async/Await语义。
 
-如下表所示，async/await已经被主流编程语言内置支持，成为异步并发应用编写的标准。
+基于async的软件task或者coroutine一般采取cooperative的调度模式，所以不需要为随机的context switch而准备call stack的存储和恢复，下表比较了基于CPU线程和async task的创建和调度开销。同时CPU线程需要MB级别的存储空间，而async task得内存是KB级别或者更少，所以同样的内存async task的数目可以是CPU tread的上千倍，async task的任务粒度更小，调度的代价和时延也更小，可以更好的利用CPU资源。
 
-
-Rust提供的基于软件task的异步并发特性被用于domain specific的library开发。例如：tokio，lunatic，这些library runtime提供了用户态的基于软件task的调度和管理能力，比OS的线程调度机制内存占用少、任务调度代价低，例如：OS的支持的thread只有几千个，而runtime可以调度的软件task可以达到10万以上，在domain问题领域能更为高效的利用硬件资源。
+这些library runtime提供了用户态的基于软件task的调度和管理能力，比OS的线程调度机制内存占用少、任务调度代价低，例如：OS的支持的thread只有几千个，而runtime可以调度的软件task可以达到10万以上，在domain问题领域能更为高效的利用硬件资源。
 https://kerkour.com/cooperative-vs-preemptive-scheduling
 
 | ation          | async            | thread           |
 |----------------|------------------|------------------|
 | Creation       | 0.3 microseconds | 17 microseconds  |
 | Context switch | 0.2 microseconds | 1.7 microseconds |
+
+
+
+如下表所示，async/await已经被主流编程语言内置支持，成为异步并发应用编写的标准。
 
 
 相比其他语言实现的Aysnc/Await，Rust的Async/Await由编译器直接转化为state machine，提前划分了内存，所以并不需要特别的runtime支持，即所谓的zero-overhead。
@@ -97,6 +131,22 @@ https://shahbhat.medium.com/structured-concurrency-in-modern-programming-languag
 | Zero-cost based abstraction ( async)    |               No              |                         No                        |                                               Yes |                         No                        |                                                No |
 | Memory Management                       |               GC              |                         GC                        |            (Automated) Reference counting, Boxing |                         GC                        |                      Automated reference counting |
 
+
+Rust Async/Await存在的问题
+
+GO语言的goroutine实现，不仅包括了语言层面的API，同时也实现了完整的runtime来完成preemptive的任务调度，同时也提供了http这类主流lib的实现。同样，swift的asyc/await实现包括也包括了基于软件task cooperative调度模式的runtime。
+
+与之对比，Rust的async/await设计只包括了基于traits的接口设计，并不包括runtime实现，完整的async/await必须包括外围生态提供的runtime。这样做的好处是，可以针对应用的特点实现不同的runtime调度机制，例如：基于I/O bound和CPU bound任务可以使用的不同的runtime，runtime可以实现基于cooperative task的调度机制，也可以实现基于preemptive的调度。缺点是，可能会出现多个竞争性的生态，用户选择太多导致无所适从。目前已经出现的async/await runtime就有6-7种
+tokio，async-std，smol，monoio，glommio，lunatic
+
+
+
+
+
+
+Rust提供的基于软件task的异步并发特性被用于domain specific的library开发。例如：tokio，lunatic，
+
+
 * 消息传递和数据隔离：级所谓的actor模式。
 
 Rust内置支持msg channel概念，例如MPSC channel。生态中，Lunatic runtime试图对标goroutine实现完整的actor模式和preemtive任务调度系统。Rust最初的版本包括preemptive调度的green task特性，非常类似Microsoft的用户态任务调度体系Fiber，后续版本删除了这个特性，因为希望由生态runtime Library来实现，而不需要在语言层实现。
@@ -105,8 +155,11 @@ Rust内置支持msg channel概念，例如MPSC channel。生态中，Lunatic run
 
 Rust的Ryaon并行计算库。
 
+Rust社区已经在考虑是否要进一步标准化Runtime来避免目前比较分化的格局，如何在标准化和鼓励创新上取舍。
+另外，当前I/O bound和CPU bound的runtime由不同的生态实现，API不一致，容易造成开发困难，是否可以进一步统一这两个不同的runtime社区。
 
-3. Rust进入操作系统。即将成为开发OS的主要语言
+
+3. ### Rust大举进入操作系统。即将成为开发OS的主要语言
 * Rust正式成为Linux Kernel的开发语言，关键的kernel library会重写，包括ISRG Prossimo(https://www.memorysafety.org/about/)项目赞助的使用Rust重写Linux Kernel和关键library（TLS，NTP等），OpenSSF提出的用安全语言（Rust，Go）重写C/C++b编写的基础软件的项目，是增大kernel话语权的机会。
 * 基于Rust开发的新型OS，例如：theseus OS利用Rust zero-overhead abstraction带来的内存隔离，摆脱了传统OS通过kernel和用户态的内存隔离，用户态进程之间的虚拟内存隔离带来的开销，实现了single address space的内存使用机制
 * 基于Rust开发的应用I/O Kernel，例如：quark，配合Linux Kernel的新异步I/O机制IO_URING实现了高性能的I/O虚拟化
@@ -126,6 +179,8 @@ Rust的Ryaon并行计算库。
 
 1. 对既有mobile OS生态的支持，完全不继承既有生态和代码资产不现实
 2. 又需要实现全栈式（编程语言、OS、应用框架、开发者体验）的颠覆式创新，才能配合新的面积换性能硬件架构
+    * 同样内存条件下软件task数量是OS线程的1000倍，任务调度切换速度比OS线程快100倍，也就是基于编程语言实现的异步并发比传统移动OS基于线程的异步并行并发计算更能提升CPU的使用效率
+    * 
 
 ### 分析
 1. 采取虚拟化的技术，新旧架构并存，逐步切换
@@ -169,6 +224,32 @@ Rust的Ryaon并行计算库。
 
 ## 基于Rust的实现的App开发框架
 
+### 基于Rust的WGPU新的GUI library
+
+提供WebGPU标准API， WebGPU是W3C标准，致力基于最新的底层Graphic API，例如：Vulcan，Metal，D3D12 提供支持
+
+https://blog.devgenius.io/will-webgpu-be-the-webgl-killer-60a49509b806
+
+https://surma.dev/things/webgpu/
+
+
+* Reduce CPU overheads
+* Good support of multi-threading
+* Bringing the Power of General-Purpose Computing (GPGPU) to the Web with Compute Shaders
+* Brand new shader language — WebGPU Shading Language (WGSL)
+* Technology that will support “Real-time ray tracing” in the future
+
+WGPU实现的
+
+
+
+
+![](https://i.imgur.com/3ARyyxj.png)
+
+### App 开发框架
+
+https://blog.logrocket.com/current-state-rust-web-frameworks/
+
 前端UI框架也是async使用的主要场景，虽然这个领域因为Rust学习曲线较为陡峭，生态发展相对较慢，但是也出现了比较有特色的UIKit和App开发框架，这些框架也有鲜明的Rust生态的模块化可组合的鲜明特点，而且因为Rust是系统编程语言，这些框架也可以实现跨平台App开发。第一种思路是利用web生态，通过webview来渲染基于vue，react这样的前端框架产生的页面，tauri提供了对平台webview和window管理的抽象，提供了前端webview和后台事件业务处理直接的消息桥梁，后端可以和yew或者deno这样的异步应用框架对接，一个web app可以较好的映射到tauri的应用框架。Tauri相比elctron这样的跨平台App框架的优势在于，Tauri利用了原生平台的webview能力，后端也可以plugin不同的async应用开发框架，所以无论在尺寸和扩展性上都比Electron这种自带chromium webview和nodejs的方案要好。
 
 
@@ -180,3 +261,8 @@ Makepad是一款Rust语言开发的模块化和高性能的UIKit，和React JSX�
 
 ![](https://i.imgur.com/vdc20Zo.png)
 
+## Mobile Rust 需要投入的方向
+
+1. ### 基于ABI实现dynamic linking
+2. ### structued async/await
+ 
