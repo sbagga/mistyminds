@@ -1,3 +1,14 @@
+
+---
+layout: post
+title:  全异步的Mobile Super Runtime构想
+categories: [Rust, Async, Runtime, mobile]
+comments_id: 10
+excerpt: 这种新的系统性硬件设计方法和架构的变革对软件系统提出了全新的挑战，尤其是如何有效的支持并行异构计算。
+
+---
+
+
 # 全异步的Mobile Super Runtime构想
 
 
