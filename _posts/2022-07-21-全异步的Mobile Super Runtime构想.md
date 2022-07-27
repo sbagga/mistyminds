@@ -1,10 +1,9 @@
-
 ---
 layout: post
 title:  全异步的Mobile Super Runtime构想
 categories: [Rust, Async, Runtime, mobile]
 comments_id: 10
-excerpt: 这种新的系统性硬件设计方法和架构的变革对软件系统提出了全新的挑战，尤其是如何有效的支持并行异构计算。
+excerpt: 新的异步并行系统性硬件设计方法和架构的变革对软件系统提出了全新的挑战，尤其是如何有效的支持并行异构计算。
 
 ---
 
@@ -125,7 +124,8 @@ https://kerkour.com/cooperative-vs-preemptive-scheduling
 2. ### 基于Rust的异步并发的Runtime生态创新极其活跃
 
 Christ Lattner列出的三种并发并行控制流，在Rust生态都有对应的项目
-#### 2.1 异步并发控制流：Rust在2019年发布的1.39版正式内置了Async/Await语意支持，自此发展出非常活跃蓬勃的runtime生态
+
+21.  #### 异步并发控制流：Rust在2019年发布的1.39版正式内置了Async/Await语意支持，自此发展出非常活跃蓬勃的runtime生态
 
 
 
@@ -171,17 +171,16 @@ async function被编译器转化为state machine，需要实现future trait的po
 
 Rust提供的基于软件task的异步并发特性被用于domain specific的library开发。例如：tokio，lunatic，
 
-#### 2.2 消息传递和数据隔离：级所谓的actor模式。
+2. #### 消息传递和数据隔离：级所谓的actor模式。
 
 Rust内置支持msg channel概念，例如：MPSC（mulitple producer single consumer） channel。生态中，Lunatic Runtime试图对标goroutine实现完整的actor模式和preemtive任务调度系统。Rust最初的版本包括preemptive调度的green task特性，非常类似Microsoft的用户态任务调度体系Fiber，后续版本删除了这个特性，因为希望由生态Runtime Library来实现，而不需要在语言层实现。
 
-#### 2.3 分布式数据和计算
+3. #### 分布式数据和计算
 
 Rust的Ryaon并行计算库实现了声明式的，基于fork/join模式的并行计算，可以用于排序、map/reduce类型的数据并行化处理。
 
 Rust社区已经在考虑是否要进一步标准化Runtime来避免目前比较分化的格局，如何在标准化和鼓励创新上取舍。
 另外，当前I/O bound和CPU bound的runtime由不同的生态实现，API不一致，容易造成开发困难，是否可以进一步统一这两个不同的runtime社区。
-
 
 3. ### Rust大举进入操作系统。即将成为开发OS的主要语言
 * Rust正式成为Linux Kernel的开发语言，关键的kernel library会重写，包括ISRG Prossimo(https://www.memorysafety.org/about/)项目赞助的使用Rust重写Linux Kernel和关键library（TLS，NTP等），OpenSSF提出的用安全语言（Rust，Go）重写C/C++b编写的基础软件的项目，是增大kernel话语权的机会。
@@ -221,12 +220,12 @@ Rust社区已经在考虑是否要进一步标准化Runtime来避免目前比较
     * CPU, thread library
     * IO_URING
     * I/O tap device，OS只提供基础的数据进出和简单控制，协议栈实现在用户空间实现
-2.  OS把CPU core和内存分配给Super Runtime（SR），并通过affinity锁定，实现对资源的一次分配
-    * SR是OS的一个process，和OS上的其他process/apps并存，SR上的GT可以通过IPC等机制和其他App实现通信。
+2.  OS把CPU core和内存分配给Super Runtime（SR），并通过OS affinity锁定，实现对资源的一次分配
+    * SR是OS的一个process，和OS上的其他process/apps并存，SR上的green task（GT）可以通过IPC等机制和其他App实现通信。
     * SR内部的GT看到的是平坦内存空间，GT直接可以通过共享内存通信。
 4.  SR是GT的OS，对GT实现资源的二次分配
     *  SR实现了对GT的资源管理、任务调度、系统服务核设备驱动，所以SR可以认为是GT的OS
-    * SR管理green task（GT），GT由用户编写和提交，SR对GT提供了基本OS的功能，包括内存管理（green task的内存和stack都在SR的内存中），GT的任务调度机，GT可以按照QoS策略调度，SR提供了用户态的设备驱动、协议栈等lib，GT共享这些lib。
+    * SR管理GT，SR对GT提供了基本OS的功能，包括内存管理（green task的内存和stack都在SR的内存中），GT的任务调度机，GT可以按照QoS策略调度，SR提供了用户态的设备驱动、协议栈等lib，GT共享这些lib。
     *  GT基于Rust crate实现，GT之间的内存隔离是编译时间静态的划分的，通过Rust的内存ownership和borrow checker保证了GT不会对内存越界访问。
     *  一个SR的App包括多个GT，一个GT包括多个Crate，Crate是SR分发和运行管理的最小单位，运行时的Crate称为Cell，Crate以Obj方式分发，被SR动态加载，动态链接（https://www.usenix.org/conference/osdi20/presentation/boos）
     *  因此用户App核保护的GT也可以被SR动态加载，动态调度
