@@ -1,4 +1,3 @@
-# Rust Open-Source Project Intern Opportuities
 
 The following Rust based open-source projects are looking for the intern to contribute.
 
