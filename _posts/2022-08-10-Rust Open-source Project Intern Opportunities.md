@@ -1,6 +1,6 @@
 # Rust Open-Source Project Intern Opportuities
 
-## [Rust Language](https://github.com/rust-lang)
+## Rust Language
 * Compiler
 * Library
 * Cargo
@@ -12,27 +12,24 @@
 * WASM integration
 * ARM devboard porting
 
-## [DORA](https://github.com/dora-rs)
+## [DORA]
 * Python integration
 * Deadline
 * AI runtime
-## [ESSA](https://github.com/essa-project/essa-rs)
+## ESSA
 * Async runtime
 * WASM integration
 * Cloud Deployment
-* * V2X validation
 
-## [Anna](https://github.com/essa-project/anna-rs)
+## Anna
 * Performance improvement
-* Cloud deployment
-* V2X validation
-## [Makepad](https://github.com/makepad/makepad)
+## Makepad
 * UI DSL
 * Component library
 * GPU drivers
-## [Bevy](https://github.com/bevyengine/bevy)
+## Bevy
 * Async preemptive runtime
 * Cloud scaling
-## [Servo](https://github.com/servo/servo)
+## Servo
 * CSS layout
 * Webrender
