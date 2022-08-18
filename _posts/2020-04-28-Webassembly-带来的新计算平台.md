@@ -1,39 +1,288 @@
----
-layout: post
-title:  Webassembly 带来的新计算平台
-categories: [web, cloud, edge, mobile]
-comments_id: 2
-excerpt: Webassembly是近10年来计算机语言的一个里程碑式的进展，作为一种通用可移植、高性能的语言规格，已经被主流浏览器支持，把web技术带入到下半场，形成了一个全新的终端计算平台，同时Webassembly也在快速被edge、cloud、blockchain社区采纳，在可以预见的未来成为一个极为重要的计算标准
----
+
+## Rust App前端开发框架
+
+Rust的前端App开发框架目前还处在比较早期，还没有产生有巨大影响力的可以挑战目前主流前端开发框架的项目，但是Rust语言最初是被发明来做浏览器开发的，所以Rust的语言特性对前端应用开发也是非常有价值的，例如：安全的并发，异步并发，基于tratis和generics的OO设计，zaro-overhead abstraction也非常有利于减少app分发尺寸。
 
 
-经过Mozilla、Google、Apple、Microsoft等技术巨头近10年的孵化和合作开发，2019年12月5号 Webassembly （WASM）Core Specification正式被W3C接纳web标准，成为浏览器中运行的HTML，CSS，Javascript之外的第四个语言，已经被四大主流浏览器（Firefox, Chrome, Safari, Edge）支持，各个层面大量的WASM开源项目开始涌现，包括语言编译器层面，几乎主流的编程语言都有WASM编译器项目，包括应用的WASM改造，包括非浏览器的WASM应用等，同时WASM社区也在非常快速扩展WASM的周边接口、安全规格等，有了WASM加持，Web浏览器重新焕发了青春，成为一个非常有竞争力的未来计算平台，Internet和web进入了进入一个新的时代。
 
 
-WASM项目要解决的一个根本问题是web和原生应用平台竞争中处于劣势的Javascript语言的性能问题，Javascript 1995年被Netscape浏览器采纳是一个比较匆忙的决定（Brendan Eich 花了10天时间开发了第一个版本的javascript语言和解释器，[https://thenewstack.io/brendan-eich-on-creating-javascript-in-10-days-and-what-hed-do-differently-today/](https://thenewstack.io/brendan-eich-on-creating-javascript-in-10-days-and-what-hed-do-differently-today/)），经过了四大浏览器巨头多年在JS语言规格和JIT编译器上的投入，JS在性能和可用性方面有巨大的进步，JS语言已经成为最受欢迎的编程语言之一， 但是也无法避免其根本性的缺陷，例如：脚本解释性语言，动态类型，内存GC机制，和底层OS的交互等，这些缺陷导致移动互联网兴起的时候，基于HTML5开发的web移动应用惨败给原生的iOS和Android应用，WASM的前身ASM.js和Google的NaCl正是在那个背景下启动的。经过10年的开发，在JS用于web浏览器25年后，WASM被正式投入使用，同时也赶上了新一波的应用机会，例如：AR/VR应用，AI应用， IoT、wearable等新场景。
+![](https://i.imgur.com/u8flvKB.png)
 
-## 1. Webassembly 是什么
+## Tauri
+Rust前端应用目前主要针对桌面App的开发，移动应用专用框架还没有。开发路线基本有两条，主要是图形渲染机制的差异。一条使用基于CSS/HTML的渲染机制，可以很好集成web生态的前端设计生态，最典型的项目如Tauri(https://tauri.app/)，这个项目类似跨平台混合应用的electron（https://www.electronjs.org/）
+区别在于Electron为了解决跨平台的体验一致性，打包了基于chromium的webview和nodejs框架，所以分发尺寸比较大，而Tauri则利用了OS本身内置的webview引擎，另外使用Rust作为应用逻辑开发，而不自带nodejs，所以分发的尺寸比较小。Tauri的核心是对基于webview渲染的窗口管理，提供了自己的窗口管理（https://github.com/tauri-apps/tao，fork于winit）
+和对多平台的webview抽象层（https://github.com/tauri-apps/wry），
+在此之上，提供了webview和Rust后台直接的事件和命令对通bridge，这样在app后段的Rust应用可以接受来自webview的event，webview前端JS代码也可以调用后端的Rust应用能力。Tauri通过plugin机制可以和其他的Rust应用框架对通，例如：可以和yew这样的web应用框架对接，yew提供了更加完善的前端应用需要的UI状态和View管理等功能，有了yew，就可以把一个完整的web app移植到Tauri。也可以和Deno对通，deno提供了大量成熟的高性能host API，例如：网络和文件系统，和事件编程模式，也支持使用WASM模块，移动应用需要的计算和I/O密集型业务可以借用deno生态开发。Tauri主要提供了抽象和粘合能力，充分利用了现有的webview生态和Rust异步应用生态，
 
-WASM是一个为虚拟计算机（Conceptual Machine）设计的概念汇编语言（Conceptual Assembly Language），设计的核心需求是跨平台和OS的可移植性（portability）和尽可能减少编译到机器代码时的性能损失（performance）。
+Tauri作为移动前端开发还处在早期，有个基于Android webview的demo，最大的不同在用移动应用不像桌面应用需要管理独立的多个窗口，移动应用的窗口数目有限，窗口管理机制也不同。可能需要针对移动应用的特点，开发不同的窗口管理机制。
 
-WASM作为一种贴近机器代码的底层编程语言规格，如果把WASM虚拟机视为一个CPU，那么WASM就是它的ISA，其实很容易让人想起另一个当红的开源项目RISC V，RISC V 的ISA也是UCB花费多年心血精心打造出来的。上面提到了WASM的一个主要设计目标是移植性，所以必然和具体的CPU实现是解耦的，它是一个简化过的计算机模型，缺少物理CPU实现时候要考虑的多核、内存页、cache等具体的工程实现。但是WASM的设计又是很低层的，和CPU的ISA有可类比性，可以尽量减少编译为机器代码时候的开销。
+## Servo
 
-Webassembly的汇编代码设计是第一个经严格按照形式化语义（formal semantics）理念设计的编程语言，这样的设计很方便做形式化证明，已经有学术界开始做这方面的工作（[https://www.cs.rit.edu/~mtf/student-resources/20191_huang_mscourse.pdf](https://www.cs.rit.edu/~mtf/student-resources/20191_huang_mscourse.pdf)）。这样的严谨设计，保障了WASM将会在具有足够长的生命周期和生命力。
+webview的路线能很好的利用web前端生态的优势，但是目前具有良好生态的浏览器内核chromium和webkit都是基于C++开发的，如果未来打造纯Rust栈的前端，则需要考虑Servo项目。
 
-下图展示了WASM的编译流程，WASM是LLVM编译器的一个backend实现。
+Servo是Mozilla使用Rust开发的浏览器内核，也是当初创造Rust语言的第一个需求，Servo内部使用了Rust的内存安全和并发安全机制，实现了异步并行的CSS/HTML解析和渲染管线，而且起模块化的设计非常适合作为嵌入式webview引擎。Servo的两个高价值的实现是
 
-![WASM和机器代码编译比较](../images/wasm-llvm.png)
+### pathfinder
+https://github.com/servo/pathfinder
+Pathfinder实现了高性能的SVG向量图渲染和字体渲染，这是任何一个UIKit都必须实现的基础功能
+
+### webrender
+https://github.com/servo/webrender
+webrender并行渲染图形库基于全新的webgpu标准，chromium和android都基于Skia图形库，Skia具有悠久的历史，基本上Skia实现的是所谓retained模式的渲染机制，即把图形渲染过程分为多个view窗口，每个view可以单独来更新，view最终可以在GPU做叠加，这种机制适应前端UI有大量局部变化的场景，局部的优化只会触发相应的view的重新绘制，而不影响其他view。另一种图形渲染思路是完全使用GPU，利用GPU的shader渲染器不仅仅可以做view的叠加也可以做view的渲染，事实上因为GPU主要是为了做3D渲染来加速游戏等业务，3D渲染的管线是完全交给GPU做的，每个pixel的绘制都又GPU完成，因为GPU是高度并行化的，安装每秒60fps来渲染每个pixel并不占用额外的计算资源和功耗，既然3D的渲染已经完全GPU化，那么2D渲染也完全使用GPU也是有道理的，这种完全不使用内存缓存view优化技术，而直接执行绘制命令的渲染模式又叫做direct mode。Mozilla的这篇博文详细介绍了2D渲染和使用GPU做2D渲染的思路（https://hacks.mozilla.org/2017/10/the-whole-web-at-maximum-fps-how-webrender-gets-rid-of-jank/）
+
+Servo目前进入了linux foundation，目前其比较欠缺的特性是对CSS的完整解析和支持。
 
 
-在浏览器环境，WASM byte code 被浏览器内置的高性能JIT编译器编译执行，例如在Chrome浏览器中，V8编译器加入了一个新的WASM编译器Liftoff，和对JS的JIT解释和热点区域JIT编译实现不同，WASM byte code会被liftoff完全编译为机器代码。WASM设计的时候也考虑到了x86和arm ISA，力求保持编译到汇编代码的overhead。目前性能落后native code在20%到100%之间（[https://www.usenix.org/system/files/atc19-jangda.pdf](https://www.usenix.org/system/files/atc19-jangda.pdf)），当然直接比较C语言和Webassembly是公平的，为了达到安全和可移植性，会有增量的代码存在。WASM的编译器技术还在发展，性能会持续提升。
+## Makepad
+另一种思路是完全独立开发基于Rust的图形库和UI框架，这里面比较有代表性的是Makepad项目。Makepad的作者Rik Arends也是web IDE cloud9(https://github.com/c9) 的主要开发者，有丰富的JS前端开发经验。Makepad项目想克服cloud9项目中选择JS和HTML/CSS带来的种种问题，构建一个实时协作的，媲美桌面IDE性能的Rust图形库和IDE产品。Makepad UIKit的主要特点是
 
-## 2. Webassembly 为web注入了新的生命力
-WASM把浏览器变成一台虚拟机，之前这个虚拟机的功能比较薄弱，只能跑Javascript，不支持其他语言，这样要支持一些性能攸关和OS相关的资源访问，就需要把这些能力植入到浏览器的本体代码里面，W3C过去为Browser标准化了很多这样的功能，例如：音频视频解码，图像渲染能力，OS外设访问等。通过支持WASM，大量的存量代码都可以被重新编译为WASM模块，可以动态加载到web应用中，通过Javascript调用，而不需要再通过浏览器来支持。这也是WASM设计的主要场景。AutoCAD公司之前尝试过把 3D 设计工具使用web技术来实现，都失败了，因为大量物理引擎计算都是C/C++写的，如果用Javascript重写性能是不达标的。通过把这些物理模拟计算的C/C++库编译为WASM，性能问题得到解决，AutoCAD终于提供了基于web技术的设计工具，功能和原生版本相差无几。另外一个例子是，第一视角射击游戏的鼻祖DOOM最近被移植到了WASM环境（[https://wasm.continuation-labs.com/d3demo/](https://wasm.continuation-labs.com/d3demo/)），当你访问这个网址，基于WASM的DOOM游戏会被加载，其可玩性和性能都是不错的。Bullet、ODE、PhysX这样的高性能物理引擎也在重新编译为WASM，可以预见的未来基于web的游戏和AR/VR应用开发环境会出现可以和Unity、Unreal这样的商业游戏引擎一较高下的web版本。
+* 基于GPU的direct mode渲染
+* 使用Rust开发，可以跨Web，Windows，MacOS和Linux平台
+* 提供类似React JSX和SwiftUI这样的声明式前端开发DSL，DSL可以动态transcompile为GPU的shader language，不需要重新编译应用就可以修改UI界面
+* 提供一套基于UI DSL的UI组件库
+* 基于Operation Transformation实现的实时协作编辑
 
-另一个值得关注是Python语言和其科学计算包对WASM的移植（[https://alpha.iodide.io/](https://alpha.iodide.io/)），python在ML/AI中被广泛使用，计算本身和前端的UI可以在浏览器中完全实现完美结合了web的连接性和原生的计算能力，会创造出全新的用户体验和场景。TensorFlow的移植也在进行中（[https://github.com/tensorflow/tfjs/tree/master/tfjs-backend-wasm](https://github.com/tensorflow/tfjs/tree/master/tfjs-backend-wasm）。
+https://github.com/makepad/makepad_docs
+
+Makepad是一款Rust语言开发的模块化和高性能的UIKit，和React JSX或者SWiftUI这样的前端DSL一样，Makepad也有Makepad UI DSL，可以描述UI组件和页面布局，不同的地方是Makepad的DSL充分兼容了figma这样的前端设计工具的语法，这样很容易把设计师通过设计工具产生的UI设计转化为Makepad UI DSL，南向，Makepad的DSL可以动态被编译为GPU的shader language，通过GPU实时渲染出页面，这样可以直接通过修改和更新Makepad UI DSL实现对UI的实时修改。通过直接调用GPU的shader能力做渲染，可以同时支持2D和3D图形渲染，具有很好的前瞻性。Makepad这种直接通过GPU渲染的方式称为Direct Mode，它的优点是渲染任务完全卸载给GPU，不占用CPU资源，传统2D图形库充分利用了2D UI具有很多局部变化的特点，对渲染页面做了内存优化，以大幅度减少需要渲染的工作量，这种方式叫做retained mode，Makepad实现中也借鉴了retained mode，减少过多使用GPU带来的功耗问题，
 
 
-## 3. Webassembly 的non-web应用
-WASM既然是一种语言规格，通过不同的编译器实现完全可以运行在非浏览器的环境，WASM也在推广non-web的应用场景，其中WASI（Webassembly System Interface）是下一个最为关键的标准，它定义了异构编程语言的Runtime和WASM模块集成，WASM在浏览器中和JS和Web API对接，WASM模块访问OS功能等场景下的接口规格，WASI是一个数据格式标准，不同语言、OS、Runtime可以遵照这个统一的数据格式实现相互之间调用时候的变量数据类型适配。通过WASI，WASM模块的可集成性得到了彻底解决。在non-web环境下已经有多个WASM runtime项目，为了进一步合力开发non-web场景下的WASM使用，Mozilla、Intel、Fastly、Redhat发起成立了Byte Code Allince（[https://hacks.mozilla.org/2019/11/announcing-the-bytecode-alliance/](https://hacks.mozilla.org/2019/11/announcing-the-bytecode-alliance/)），包含了WASMTIME、Lucet、WAMR三个Runtiem和Cranelift，WASI COMMON等开源项目。同时也展示了他们规划的nanoprocess理念，提供了WASM模块之间的动态调用链接和基于细粒度能力调用的沙箱机制，这种nanoprocess将会极大推进一步推进软件SOA理念的实现。
+Makepad架构
 
-本篇只是WASM最宏观的介绍，WASM技术还在快速发展和演进中，后续还会具体介绍相关领域的进展。
+* Makepad北向提供了基于UI DSL描述的组件库，这些组件库可以实现动态更新和动态编译，不需要重新编译Rust应用，就可以动态调试UI界面，达到了类似web应用开发的速度和体验。这个特性主要为了支持Makepad的studio产品，studio融合和设计师的设计界面，对标figma，也是前端工程师的IDE界面，设计师和前端工程师直接的hand-off流程是通过Makepad DSL实现的，DSL的语法非常接近figma输出的UI组件描述语法，如下面的代码所示，描述一个页面框，调用了frame组件，通过UI DSL描述大小、边缘、填充色等，这些UI外观属性可以动态修改，不需要重新编译Rust代码，所见即所得。这个思路和之前的想法很一致（https://github.com/mistyminds/mistyminds/blob/master/posts/2020-07-27-%E6%96%B0%E4%B8%80%E4%BB%A3%E7%9A%84app%E5%BC%80%E5%8F%91.md）
+
+```
+live_register!{
+    use makepad_component::frame::*;
+    use FrameComponent::*;
+    App: {{App}} {
+        frame: {
+            width: Fill
+            height: Fill
+            layout:{align: {x: 0.0, y: 0.5}, padding: 30,spacing: 30.}
+            Solid {bg:{color: #0f0}, width: Fill, height: 40}
+            Solid {
+                bg:{color: #0ff},
+                layout:{padding: 10, flow: Down, spacing: 10},
+                width: Fit,
+                height: 300
+                Solid {bg:{color: #00f}, width: 40, height: Fill}
+                Solid {bg:{color: #f00}, width: 40, height: 40}
+                Solid {bg:{color: #00f}, width: 40, height: 40}
+            }
+            Solid {bg:{color: #f00}, width: 40, height: 40}
+            Solid {bg:{color: #f0f}, width: Fill, height: 60}
+            Solid {bg:{color: #f00}, width: 40, height: 40}
+        }
+    }
+}
+```
+
+* UI DSL被内置在App内的基于Rust实现的transcompiler翻译为对应的组件，是通过Rust的Macro实现的，组件编写借用了Shardertoy的2D API，（https://www.shadertoy.com/view/lslXW8）
+```
+
+live_register!{
+    use makepad_platform::shader::std::*;
+    
+    DrawLabelText: {{DrawLabelText}} {
+        text_style: {
+            font: {
+                //path: d"resources/IBMPlexSans-SemiBold.ttf"
+            }
+            font_size: 11.0
+        }
+        fn get_color(self) -> vec4 {
+            return mix(
+                mix(
+                    #9,
+                    #f,
+                    self.hover
+                ),
+                #9,
+                self.pressed
+            )
+        }
+    }
+    
+    Button: {{Button}} {
+        bg_quad: {
+            instance hover: 0.0
+            instance pressed: 0.0
+            
+            const BORDER_RADIUS: 3.0
+            
+            fn pixel(self) -> vec4 {
+                let sdf = Sdf2d::viewport(self.pos * self.rect_size);
+                let grad_top = 5.0;
+                let grad_bot = 1.0;
+                let body = mix(mix(#53, #5c, self.hover), #33, self.pressed);
+                let body_transp = vec4(body.xyz, 0.0);
+                let top_gradient = mix(body_transp, mix(#6d, #1f, self.pressed), max(0.0, grad_top - sdf.pos.y) / grad_top);
+                let bot_gradient = mix(
+                    mix(body_transp, #5c, self.pressed),
+                    top_gradient,
+                    clamp((self.rect_size.y - grad_bot - sdf.pos.y - 1.0) / grad_bot, 0.0, 1.0)
+                );
+                
+                // the little drop shadow at the bottom
+                let shift_inward = BORDER_RADIUS + 4.0;
+                sdf.move_to(shift_inward,self.rect_size.y-BORDER_RADIUS);
+                sdf.line_to(self.rect_size.x-shift_inward,self.rect_size.y-BORDER_RADIUS);
+                sdf.stroke(
+                    mix(mix(#2f,#1f,self.hover), #0000, self.pressed),
+                    BORDER_RADIUS
+                )
+
+                sdf.box(
+                    1.,
+                    1.,
+                    self.rect_size.x - 2.0,
+                    self.rect_size.y - 2.0,
+                    BORDER_RADIUS
+                )
+                sdf.fill_keep(body)
+                
+                sdf.stroke(
+                    bot_gradient,
+                    1.0
+                )
+                
+                return sdf.result
+            }
+        }
+        
+        walk: {
+            width: Size::Fit,
+            height: Size::Fit,
+            margin: {left: 1.0, right: 1.0, top: 1.0, bottom: 1.0},
+        }
+        
+        layout: {
+            align: {x: 0.5, y: 0.5},
+            padding: {left: 14.0, top: 10.0, right: 14.0, bottom: 10.0}
+        }
+        
+        state:{
+            hover = {
+                default: off,
+                off = {
+                    from: {all: Play::Forward {duration: 0.1}}
+                    apply: {
+                        bg_quad: {pressed: 0.0, hover: 0.0}
+                        label_text: {pressed: 0.0, hover: 0.0}
+                    }
+                }
+                
+                on = {
+                    from: {
+                        all: Play::Forward {duration: 0.1}
+                        pressed: Play::Forward {duration: 0.01}
+                    }
+                    apply: {
+                        bg_quad: {pressed: 0.0, hover: [{time: 0.0, value: 1.0}],}
+                        label_text: {pressed: 0.0, hover: [{time: 0.0, value: 1.0}],}
+                    }
+                }
+                
+                pressed = {
+                    from: {all: Play::Forward {duration: 0.2}}
+                    apply: {
+                        bg_quad: {pressed: [{time: 0.0, value: 1.0}], hover: 1.0,}
+                        label_text: {pressed: [{time: 0.0, value: 1.0}], hover: 1.0,}
+                    }
+                }
+            }
+        }
+    }
+}
+
+```
+
+* 并注册适当的event handler，组件的外观描述和其event handler被封装在一个组件模块，实现模式类似JSX
+
+```
+impl Button {
+    
+    pub fn handle_event(&mut self, cx: &mut Cx, event: &mut Event) -> ButtonAction {
+        
+        self.state_handle_event(cx, event);
+        let res = self.button_logic.handle_event(cx, event, self.bg_quad.area());
+        
+        match res.state {
+            ButtonState::Pressed => self.animate_state(cx, ids!(hover.pressed)),
+            ButtonState::Default => self.animate_state(cx, ids!(hover.off)),
+            ButtonState::Hover => self.animate_state(cx, ids!(hover.on)),
+            _ => ()
+        };
+        res.action
+    }
+    
+    pub fn draw_label(&mut self, cx: &mut Cx2d, label: &str) {
+        self.bg_quad.begin(cx, self.walk, self.layout);
+        self.label_text.draw_walk(cx, Walk::fit(), Align::default(), label);
+        self.bg_quad.end(cx);
+    }
+    
+    pub fn draw_walk(&mut self, cx: &mut Cx2d, walk: Walk) {
+        self.bg_quad.begin(cx, walk, self.layout);
+        self.label_text.draw_walk(cx, Walk::fit(), Align::default(), &self.label);
+        self.bg_quad.end(cx);
+    }
+}
+Footer
+
+```
+* 对组件的绘制更新操作会被内置的在线layout引擎管理，做去重和batch化等优化操作，形成一个渲染节点组成的tree。
+
+
+
+* 对组件的操作构成一个绘制列表，发送给下游的shader编译器，编译器会把GLSL动态编译为底层Graphics API需要的底层语言，例如：SPIR-V，进而发送给GPU进行绘制操作。
+* 借鉴了servo项目的pathfinder2，实现了基于GPU的字体渲染
+
+![](https://i.imgur.com/yStkSi9.png)
+
+
+Makepad UI Kit和应用的集成分为两种模式
+
+* 一种是设计师设计流程和App开发流程整合在一个IDE中，这样设计师可以持续修改设计，前端工程师可以持续开发代码，因为Makepad studio具备类似google doc这样的实时协作编辑能力，设计师和前端工程师的工作始终可以同步。
+* 另一种是，前端工程师使用已经pregenerated UI 组件，不需要再更改外观设计
+
+![](https://i.imgur.com/oeEKi9l.png)
+
+
+## ZED IDE项目
+https://zed.dev/tech
+无独有偶，Github的ATOM团队今年也宣布暂停基于Electron框架的ATOM IDE开发，同时启动了一个新的IDE项目，基本思路和Makepad的思路类似
+ 
+* 基于Rust语言实现跨平台
+* 基于GPU实现的direct 渲染模式的图形库，称为GPUI
+* 基于CRDT实现的实时协作编辑
+
+
+
+
+## WGPU 
+
+https://wgpu.rs
+
+
+WGPU提供对WebGPU标准API的封装， 基于Rust实现，是目前WebGPU生态最重要的底层graphic library。WebGPU是W3C标准，致力支持最新的底层Graphic API，例如：Vulcan，Metal，D3D12，
+
+https://blog.devgenius.io/will-webgpu-be-the-webgl-killer-60a49509b806
+
+https://surma.dev/things/webgpu/
+
+WebGPU的优势
+* Reduce CPU overheads
+* Good support of multi-threading
+* Bringing the Power of General-Purpose Computing (GPGPU) to the Web with Compute Shaders
+* 提供基于Rust语法的新的shader language WSGL
+* Technology that will support “Real-time ray tracing” in the future
+
+WGPU支持基于web核native的的应用场景
+
+
+
+
+![](https://i.imgur.com/3ARyyxj.png)
+
