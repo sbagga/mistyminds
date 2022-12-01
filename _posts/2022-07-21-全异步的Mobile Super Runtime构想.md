@@ -78,7 +78,7 @@ LLVM编译器和SWIFT语言的发明人Chris Lattner也系统阐述了这种异�
     * thread的运行取决于外部条件，例如：读写I/O，或者等待数据同步，多thread设计可以让OS根据thread的运行状态来调度准备好的thread在CPU上运行，等待状态的thread被挂起，不占用CPU资源，这样可以充分利用CPU资源。OS还提供支持异构并行并发的数据同步API，例如：POSIX的mutex，semaphore等原子操作，select和epoll等事件驱动的I/O API，配合thread实现异步并发并行能力。
     * 不同的编程语言都提供使用OS原生的多线程异步并发并行能力的语言API，例如：POSIX API本身就是C语言实现的，其他语言都有POSIX API 的wrapper
     * 供给开发者一个安全易用的异步并行并发语言表达和API是编程语言的主要功能，例如：函数调度为基于线程的异步执行，多线程函数之间的数据同步，线程的生命周期管理。
-    * C/C++之后发展出来的编程语言例如：java，C#，javascript，python都带有一个复杂的runtime，用于支持安全动态的内存使用，也能完整控制用户程序的运行行为，所以发展出了所谓的用户态线程和用户态的任务调度机制，为了区别 OS thread，这类用户态的thread一般称为green task（coroutine）。green task提供给用户和编程语言特性融合的异步多任务控制流表达能力，编程语言Runtime则实现了green task到OS thread和CPU core的映射，这种映射中，OS thread可以和CPU Core做绑定，叫做CPU affinity，这样OS就不会把已经映射的thread调度到其他CPU core上。这种映射可以是1:1映射，即green task不会被调度到多于一个CPU core，也可以是N:M模式，即green task可以被调度到多于一个CPU core上运行。Runtime的映射策略可以是静态的也可以是动态的。
+    * 现代编程语言，如 go，C#，javascript，python都带有一个虚拟机或者runtime，用于支持安全动态的内存使用，也能完整控制用户程序的运行行为，所以发展出了所谓的用户态线程和用户态的任务调度机制，为了区别 OS thread，这类用户态的thread一般称为green task（coroutine）。green task提供给用户和编程语言特性融合的异步多任务控制流表达能力，编程语言Runtime则实现了green task到OS thread和CPU core的映射，这种映射中，OS thread可以和CPU Core做绑定，叫做CPU affinity，这样OS就不会把已经映射的thread调度到其他CPU core上。这种映射可以是1:1映射，即green task不会被调度到多于一个CPU core，也可以是N:M模式，即green task可以被调度到多于一个CPU core上运行。Runtime的映射策略可以是静态的也可以是动态的。
 
 * Preemptive vs Cooperative scheduling, Stackful vs Stackless task
     * 语言Runtime实现green task的调度有两种策略，一种是协作式的（cooperative），即green task的运行不会被Runtime打断，会一直运行到结束为止，即run to complete模式，这种情况下Runtime不需要为green task做function stack的完全备份和恢复，因为任务总是会正常退出的，这样runtime的设计会比较简单，缺点是green task必须自觉把CPU让出给Runtime（yield），如果不让出，任务可以一直运行，导致其他任务得不到运行时间，甚至锁死系统。而且，任务调度需要实现一些资源共享策略，比如平均使用CPU时间，或者某类QoS SLA，Runtime如果不能随时切换green task，则不能保证任务的QoS。
